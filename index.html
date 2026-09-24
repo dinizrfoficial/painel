@@ -1,311 +1,553 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desativar Proteção de Áudio (ROOT) - Diniz-RF</title>
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-color: #3b82f6;
-            --accent-hover: #2563eb;
-            --code-bg: #090d16;
-            --border-color: #334155;
-            --callout-bg: rgba(59, 130, 246, 0.1);
-        }
+<style>
+/* ==============================
+   Z-LINK - CENTRAL DE DOWNLOADS
+   ============================== */
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+.zlink-downloads {
+    max-width: 850px;
+    margin: 30px auto;
+    padding: 30px 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    color: #ffffff;
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            padding: 20px;
-        }
+    background:
+        radial-gradient(circle at top, rgba(0,255,100,.10), transparent 35%),
+        linear-gradient(145deg, #161616, #080808);
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-        }
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 24px;
 
-        .header {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            padding: 30px;
-            border-bottom: 3px solid var(--accent-color);
-            text-align: center;
-        }
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.04);
 
-        .header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-            color: #ffffff;
-        }
-
-        .badge {
-            display: inline-block;
-            background-color: var(--accent-color);
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-top: 5px;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        section {
-            margin-bottom: 25px;
-        }
-
-        h2 {
-            font-size: 1.2rem;
-            color: #60a5fa;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--accent-color);
-            padding-left: 10px;
-        }
-
-        p {
-            margin-bottom: 10px;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        a {
-            color: #60a5fa;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .code-container {
-            position: relative;
-            margin: 10px 0 15px 0;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            background-color: var(--code-bg);
-        }
-
-        pre {
-            padding: 15px;
-            padding-right: 75px;
-            overflow-x: auto;
-            font-family: "Courier New", Courier, monospace;
-            font-size: 0.88rem;
-            color: #e2e8f0;
-            margin: 0;
-        }
-
-        code {
-            font-family: "Courier New", Courier, monospace;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 2px 5px;
-            border-radius: 4px;
-            font-size: 0.88rem;
-        }
-
-        pre code {
-            background-color: transparent;
-            padding: 0;
-        }
-
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: var(--border-color);
-            color: #e2e8f0;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.2s, color 0.2s;
-        }
-
-        .copy-btn:hover {
-            background-color: var(--accent-color);
-            color: #fff;
-        }
-
-        .copy-btn.copied {
-            background-color: #10b981;
-            color: #fff;
-        }
-
-        .callout {
-            background-color: var(--callout-bg);
-            border-left: 4px solid var(--accent-color);
-            padding: 15px;
-            border-radius: 0 6px 6px 0;
-            margin-top: 15px;
-        }
-
-        .callout p {
-            color: var(--text-color);
-            margin-bottom: 0;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #090d16;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            border-top: 1px solid var(--border-color);
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="header">
-        <h1>Desativar Proteção de Áudio (ROOT)</h1>
-        <p>Guia definitivo para remoção do aviso de volume seguro em TV Box Android</p>
-        <span class="badge">Método Desenvolvido por Diniz-RF</span>
-    </div>
-
-    <div class="content">
-        <section>
-            <h2>1. Baixe o SDK Platform Tools</h2>
-            <p>Acesse o link oficial para baixar as ferramentas ADB:</p>
-            <p><a href="https://developer.android.com/tools/releases/platform-tools?utm_source=chatgpt.com&hl=pt-br" target="_blank">https://developer.android.com/tools/releases/platform-tools</a></p>
-            <p>Extraia o arquivo compactado em seu computador, abra o Prompt de Comando (CMD) dentro da pasta extraída e execute os comandos a seguir.</p>
-        </section>
-
-        <section>
-            <h2>2. Conecte o Dispositivo</h2>
-            <p>Primeiro, encerre servidores ADB anteriores e conecte o dispositivo via IP (substitua pelo IP real da sua TV Box):</p>
-            <div class="code-container">
-                <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                <pre><code>.\adb kill-server
-.\adb connect IP-DA-BOX</code></pre>
-            </div>
-        </section>
-
-        <section>
-            <h2>3. Obtenção de Acesso Root</h2>
-            <p>Execute a sequência para reiniciar o adb em modo root, remontar a partição e entrar no shell do sistema:</p>
-            <div class="code-container">
-                <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                <pre><code>.\adb root
-.\adb remount
-.\adb shell</code></pre>
-            </div>
-        </section>
-
-        <section>
-            <h2>4. Elevação de Privilégios (SU)</h2>
-            <p>Dentro do prompt interativo do ADB shell, digite o comando para assumir o superusuário:</p>
-            <div class="code-container">
-                <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                <pre><code>su</code></pre>
-            </div>
-        </section>
-
-        <section>
-            <h2>5. Criação da Pasta, Script e Execução de Teste</h2>
-            <p>No terminal do dispositivo (já com privilégios <code>su</code>), execute o bloco para criar o diretório, gravar o script de monitoramento, conceder permissões e iniciar o processo:</p>
-            <div class="code-container">
-                <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                <pre><code>mkdir -p /system/etc/init.d
-printf '#!/system/bin/sh\nuntil [ "$(getprop sys.boot_completed)" = "1" ]; do sleep 2; done\nwhile true; do\nST=$(settings get global audio_safe_volume_state)\nif [ "$ST" != "1" ]; then\nsettings put global audio_safe_volume_state 1\nsettings put global safe_media_volume_enabled 0\nfi\nsetprop audio.safemedia.bypass true\nsleep 4\ndone &\n' > /system/etc/init.d/disable_safe_volume.sh
-chmod 755 /system/etc/init.d/disable_safe_volume.sh
-/system/etc/init.d/disable_safe_volume.sh</code></pre>
-            </div>
-        </section>
-
-        <section>
-            <h2>6. Configuração do Gancho de Boot (Install Recovery)</h2>
-            <p>Crie o script de inicialização automática no recovery do sistema:</p>
-            <div class="code-container">
-                <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                <pre><code>printf '#!/system/bin/sh\n/system/etc/init.d/disable_safe_volume.sh &\n' > /system/etc/install-recovery.sh</code></pre>
-            </div>
-        </section>
-
-        <section>
-            <h2>7. Permissões do Gancho de Inicialização</h2>
-            <p>Conceda permissão de execução ao arquivo de boot:</p>
-            <div class="code-container">
-                <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                <pre><code>chmod 755 /system/etc/install-recovery.sh</code></pre>
-            </div>
-        </section>
-
-        <section>
-            <h2>8. Cópia de Segurança para a Pasta Bin</h2>
-            <p>Duplique o script para a pasta bin do sistema para garantir compatibilidade com diferentes ROMs:</p>
-            <div class="code-container">
-                <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                <pre><code>cp /system/etc/install-recovery.sh /system/bin/install-recovery.sh
-chmod 755 /system/bin/install-recovery.sh</code></pre>
-            </div>
-        </section>
-
-        <section>
-            <h2>9. Reinicialização</h2>
-            <p>Por último, reinicie o aparelho para aplicar todas as modificações permanentemente:</p>
-            <div class="code-container">
-                <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                <pre><code>reboot</code></pre>
-            </div>
-        </section>
-
-        <div class="callout">
-            <p><strong>Verificação Pós-Boot:</strong> Após reiniciar a TV Box, abra novamente o terminal e verifique se o retorno do estado do volume é <strong>1</strong>:</p>
-            <div class="code-container" style="margin-top: 10px; margin-bottom: 0;">
-                <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
-                <pre style="padding-right: 75px;"><code>.\adb shell settings get global audio_safe_volume_state</code></pre>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer">
-        <p>&copy; 2026 Tutorial de Otimização Android &bull; Criado por <strong>Diniz-RF</strong></p>
-    </div>
-</div>
-
-<script>
-function copyCode(button) {
-    const container = button.closest('.code-container');
-    const codeBlock = container.querySelector('code');
-    const textToCopy = codeBlock.innerText;
-
-    navigator.clipboard.writeText(textToCopy).then(() => {
-        const originalText = button.innerText;
-        button.innerText = 'Copiado!';
-        button.classList.add('copied');
-
-        setTimeout(() => {
-            button.innerText = originalText;
-            button.classList.remove('copied');
-        }, 2000);
-    }).catch(err => {
-        console.error('Erro ao copiar: ', err);
-    });
+    overflow: hidden;
+    position: relative;
 }
-</script>
 
-</body>
-</html>
+/* brilho superior */
+.zlink-downloads:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10%;
+    width: 80%;
+    height: 2px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #00ff66,
+        #ffff00,
+        #00ffff,
+        transparent
+    );
+
+    box-shadow: 0 0 18px rgba(0,255,100,.8);
+}
+
+/* título */
+.zlink-title {
+    margin: 5px 0 8px;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: .5px;
+}
+
+.zlink-title .z {
+    color: #eeeeee;
+}
+
+.zlink-title .dash {
+    color: #fcff01;
+}
+
+.zlink-title .link {
+    color: #eeeeee;
+}
+
+.zlink-title .downloads {
+    color: #04ff00;
+}
+
+.zlink-subtitle {
+    margin-bottom: 25px;
+    color: #aaaaaa;
+    font-size: 14px;
+}
+
+/* imagem */
+.zlink-cover {
+    margin: 15px auto 30px;
+}
+
+.zlink-cover a {
+    display: inline-block;
+    position: relative;
+}
+
+.zlink-cover img {
+    display: block;
+    width: 230px;
+    max-width: 75vw;
+    height: auto;
+
+    border-radius: 18px;
+
+    border: 1px solid rgba(255,255,255,.15);
+
+    box-shadow:
+        0 12px 35px rgba(0,0,0,.7),
+        0 0 25px rgba(0,255,80,.12);
+
+    transition:
+        transform .35s ease,
+        box-shadow .35s ease,
+        filter .35s ease;
+}
+
+.zlink-cover img:hover {
+    transform: translateY(-6px) scale(1.025);
+
+    box-shadow:
+        0 20px 45px rgba(0,0,0,.8),
+        0 0 35px rgba(0,255,80,.30);
+
+    filter: brightness(1.08);
+}
+
+/* grade */
+.zlink-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+}
+
+/* botões */
+.zlink-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 72px;
+    padding: 14px 18px;
+
+    text-decoration: none !important;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.07),
+            rgba(255,255,255,.025)
+        );
+
+    border: 1px solid rgba(255,255,255,.10);
+
+    box-shadow:
+        0 8px 18px rgba(0,0,0,.25),
+        inset 0 1px 0 rgba(255,255,255,.05);
+
+    overflow: hidden;
+
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease,
+        background .25s ease;
+}
+
+.zlink-btn:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -130%;
+
+    width: 80%;
+    height: 100%;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.13),
+        transparent
+    );
+
+    transform: skewX(-20deg);
+
+    transition: left .55s ease;
+}
+
+.zlink-btn:hover:before {
+    left: 150%;
+}
+
+.zlink-btn:hover {
+    transform: translateY(-4px);
+
+    border-color: rgba(0,255,100,.55);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(0,255,100,.10),
+            rgba(255,255,255,.04)
+        );
+
+    box-shadow:
+        0 13px 28px rgba(0,0,0,.42),
+        0 0 20px rgba(0,255,100,.10);
+}
+
+.zlink-btn:active {
+    transform: scale(.98);
+}
+
+/* conteúdo do botão */
+.zlink-btn-content {
+    position: relative;
+    z-index: 2;
+
+    font-size: 21px;
+    font-weight: 700;
+
+    line-height: 1.25;
+}
+
+/* cores */
+.white {
+    color: #eeeeee;
+}
+
+.yellow {
+    color: #fcff01;
+}
+
+.green {
+    color: #04ff00;
+}
+
+.cyan {
+    color: #01ffff;
+}
+
+.orange {
+    color: #ffa400;
+}
+
+/* pequenos subtítulos */
+.btn-info {
+    display: block;
+    margin-top: 5px;
+
+    font-size: 11px;
+    font-weight: normal;
+
+    color: #888888;
+
+    letter-spacing: .6px;
+    text-transform: uppercase;
+}
+
+/* destaque principal */
+.zlink-main {
+    border-color: rgba(0,255,100,.30);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(0,255,100,.10),
+            rgba(255,255,255,.03)
+        );
+}
+
+.zlink-main:hover {
+    border-color: #04ff00;
+
+    box-shadow:
+        0 15px 30px rgba(0,0,0,.5),
+        0 0 24px rgba(4,255,0,.18);
+}
+
+/* atualizações */
+.zlink-update {
+    margin-top: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,255,70,.16),
+            rgba(0,255,255,.05)
+        );
+
+    border-color: rgba(89,255,0,.35);
+}
+
+.zlink-update:hover {
+    border-color: #59ff00;
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.5),
+        0 0 28px rgba(89,255,0,.18);
+}
+
+/* divisor */
+.zlink-divider {
+    width: 70%;
+    height: 1px;
+
+    margin: 27px auto;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.18),
+        transparent
+    );
+}
+
+/* animação inicial */
+@keyframes zlinkAppear {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.zlink-downloads {
+    animation: zlinkAppear .7s ease-out;
+}
+
+/* mobile */
+@media (max-width: 650px) {
+    .zlink-downloads {
+        margin: 15px 5px;
+        padding: 25px 13px;
+        border-radius: 18px;
+    }
+
+    .zlink-grid {
+        grid-template-columns: 1fr;
+        gap: 11px;
+    }
+
+    .zlink-title {
+        font-size: 25px;
+    }
+
+    .zlink-btn {
+        min-height: 65px;
+    }
+
+    .zlink-btn-content {
+        font-size: 19px;
+    }
+
+    .zlink-cover img {
+        width: 200px;
+    }
+}
+</style>
+
+
+<div class="zlink-downloads">
+
+    <!-- TÍTULO -->
+    <div class="zlink-title">
+        <span class="z">Z</span><span class="dash">-</span><span class="link">Link</span>
+        <span class="downloads">Downloads</span>
+    </div>
+
+    <div class="zlink-subtitle">
+        Aplicativos, ferramentas e informações oficiais
+    </div>
+
+
+    <!-- CAPA -->
+    <div class="zlink-cover">
+
+        <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyDtNJJUyIeSmYry8-C7mAQW4Dxz72PDNr7-jTpmjRK0XkVLgogJ-mjf-YY4iMmWYimFEnxnoLan_08uprxw8BwMoAxgzv4G8kdxCYlFHTMNUAB4ILN9KKOedgs7Xjw47Qne2xW1soksRs1N8-R5e0ay1jN9tpelVxYFcJ48DC2Y6yKNvQezs3b1viMlhw/s1536/Capa.png">
+
+            <img
+                src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyDtNJJUyIeSmYry8-C7mAQW4Dxz72PDNr7-jTpmjRK0XkVLgogJ-mjf-YY4iMmWYimFEnxnoLan_08uprxw8BwMoAxgzv4G8kdxCYlFHTMNUAB4ILN9KKOedgs7Xjw47Qne2xW1soksRs1N8-R5e0ay1jN9tpelVxYFcJ48DC2Y6yKNvQezs3b1viMlhw/s320/Capa.png"
+                alt="Z-Link"
+            />
+
+        </a>
+
+    </div>
+
+
+    <div class="zlink-grid">
+
+        <!-- Z-LINK TALK -->
+        <a
+            class="zlink-btn zlink-main"
+            href="https://github.com/dinizrfoficial/update/releases/download/apk/app-release.apk">
+
+            <div class="zlink-btn-content">
+
+                <span class="white">Z</span><span class="yellow">-</span><span class="white">Link</span>
+                <span class="yellow">Talk</span>
+                <span class="green">APP</span>
+
+                <span class="btn-info">
+                    Baixar aplicativo
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- FICHA TÉCNICA -->
+        <a
+            class="zlink-btn"
+            href="https://diniz-rf.github.io/Z-LINK-V5.1---Ficha-T-cnica/">
+
+            <div class="zlink-btn-content">
+
+                <span class="yellow">Ficha Técnica</span><br>
+
+                <span class="white">Z</span><span class="yellow">-</span><span class="white">Link</span>
+                <span class="green">V5.1</span>
+
+                <span class="btn-info">
+                    Informações do produto
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- Z-LINK ECHO -->
+        <a
+            class="zlink-btn"
+            href="https://diniz-rf.github.io/Z-Link-Echo-Web/">
+
+            <div class="zlink-btn-content">
+
+                <span class="white">Z</span><span class="yellow">-</span><span class="white">Link</span>
+                <span class="cyan">Echo</span>
+                <span class="green">Web</span>
+
+                <span class="btn-info">
+                    Acessar Echo Web
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- ANYDESK -->
+        <a
+            class="zlink-btn"
+            href="https://download.anydesk.com/anydesk.apk">
+
+            <div class="zlink-btn-content">
+
+                <span class="white">Any</span><span class="cyan">Desk</span>
+
+                <span class="btn-info">
+                    Baixar para Android
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- ZELLO LINK NEW -->
+        <a
+            class="zlink-btn"
+            href="https://github.com/Diniz-RF/APPS/releases/download/V9.9.9/Zello-Link-7-12-1.apk">
+
+            <div class="zlink-btn-content">
+
+                <span class="orange">Zello</span><span class="white">-</span><span class="cyan">Link</span>
+                <span class="green">New</span>
+
+                <span class="btn-info">
+                    Versão completa
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- ZELLO LINK LITE -->
+        <a
+            class="zlink-btn"
+            href="https://github.com/Diniz-RF/APPS/raw/refs/heads/main/Zello-Link-5-1-9.apk">
+
+            <div class="zlink-btn-content">
+
+                <span class="orange">Zello</span><span class="white">-</span><span class="cyan">Link</span>
+                <span class="cyan">LITE</span>
+
+                <span class="btn-info">
+                    Versão leve
+                </span>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <div class="zlink-divider"></div>
+
+
+    <!-- SAFMEDIA -->
+    <a
+        class="zlink-btn"
+        href="https://diniz-rf.github.io/safmedia/">
+
+        <div class="zlink-btn-content">
+
+            <span class="yellow">
+                Como desativar SafMedia
+            </span>
+
+            <span class="btn-info">
+                Tutorial
+            </span>
+
+        </div>
+
+    </a>
+
+
+    <!-- ATUALIZAÇÕES -->
+    <a
+        class="zlink-btn zlink-update"
+        href="https://diniz-rf.github.io/loja/">
+
+        <div class="zlink-btn-content">
+
+            <span class="green">
+                ⟳ ATUALIZAÇÕES
+            </span>
+
+            <span class="btn-info">
+                Ver versões e novidades
+            </span>
+
+        </div>
+
+    </a>
+
+</div>
