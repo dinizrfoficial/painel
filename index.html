@@ -1,553 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<title>Z-Link Talk — Central de Controle</title>
 <style>
-/* ==============================
-   Z-LINK - CENTRAL DE DOWNLOADS
-   ============================== */
-
-.zlink-downloads {
-    max-width: 850px;
-    margin: 30px auto;
-    padding: 30px 20px;
-    font-family: Arial, Helvetica, sans-serif;
-    text-align: center;
-    color: #ffffff;
-
-    background:
-        radial-gradient(circle at top, rgba(0,255,100,.10), transparent 35%),
-        linear-gradient(145deg, #161616, #080808);
-
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 24px;
-
-    box-shadow:
-        0 20px 60px rgba(0,0,0,.45),
-        inset 0 1px 0 rgba(255,255,255,.04);
-
-    overflow: hidden;
-    position: relative;
+:root{
+  --bg:#07111f;--bg2:#0b1627;--panel:#101d2f;--panel2:#14243a;--line:#263b56;
+  --text:#edf5ff;--muted:#9fb0c5;--blue:#4aa3ff;--blue2:#2878d8;--green:#2dd47e;
+  --red:#ff5c70;--orange:#ffae4a;--purple:#9b7bff;--cyan:#42d9e8;--shadow:0 20px 60px rgba(0,0,0,.28);
+  --radius:18px;
 }
-
-/* brilho superior */
-.zlink-downloads:before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 10%;
-    width: 80%;
-    height: 2px;
-
-    background: linear-gradient(
-        90deg,
-        transparent,
-        #00ff66,
-        #ffff00,
-        #00ffff,
-        transparent
-    );
-
-    box-shadow: 0 0 18px rgba(0,255,100,.8);
-}
-
-/* título */
-.zlink-title {
-    margin: 5px 0 8px;
-    font-size: 30px;
-    font-weight: 800;
-    letter-spacing: .5px;
-}
-
-.zlink-title .z {
-    color: #eeeeee;
-}
-
-.zlink-title .dash {
-    color: #fcff01;
-}
-
-.zlink-title .link {
-    color: #eeeeee;
-}
-
-.zlink-title .downloads {
-    color: #04ff00;
-}
-
-.zlink-subtitle {
-    margin-bottom: 25px;
-    color: #aaaaaa;
-    font-size: 14px;
-}
-
-/* imagem */
-.zlink-cover {
-    margin: 15px auto 30px;
-}
-
-.zlink-cover a {
-    display: inline-block;
-    position: relative;
-}
-
-.zlink-cover img {
-    display: block;
-    width: 230px;
-    max-width: 75vw;
-    height: auto;
-
-    border-radius: 18px;
-
-    border: 1px solid rgba(255,255,255,.15);
-
-    box-shadow:
-        0 12px 35px rgba(0,0,0,.7),
-        0 0 25px rgba(0,255,80,.12);
-
-    transition:
-        transform .35s ease,
-        box-shadow .35s ease,
-        filter .35s ease;
-}
-
-.zlink-cover img:hover {
-    transform: translateY(-6px) scale(1.025);
-
-    box-shadow:
-        0 20px 45px rgba(0,0,0,.8),
-        0 0 35px rgba(0,255,80,.30);
-
-    filter: brightness(1.08);
-}
-
-/* grade */
-.zlink-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-    margin-top: 20px;
-}
-
-/* botões */
-.zlink-btn {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    min-height: 72px;
-    padding: 14px 18px;
-
-    text-decoration: none !important;
-
-    border-radius: 15px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,.07),
-            rgba(255,255,255,.025)
-        );
-
-    border: 1px solid rgba(255,255,255,.10);
-
-    box-shadow:
-        0 8px 18px rgba(0,0,0,.25),
-        inset 0 1px 0 rgba(255,255,255,.05);
-
-    overflow: hidden;
-
-    transition:
-        transform .25s ease,
-        border-color .25s ease,
-        box-shadow .25s ease,
-        background .25s ease;
-}
-
-.zlink-btn:before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -130%;
-
-    width: 80%;
-    height: 100%;
-
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,255,255,.13),
-        transparent
-    );
-
-    transform: skewX(-20deg);
-
-    transition: left .55s ease;
-}
-
-.zlink-btn:hover:before {
-    left: 150%;
-}
-
-.zlink-btn:hover {
-    transform: translateY(-4px);
-
-    border-color: rgba(0,255,100,.55);
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(0,255,100,.10),
-            rgba(255,255,255,.04)
-        );
-
-    box-shadow:
-        0 13px 28px rgba(0,0,0,.42),
-        0 0 20px rgba(0,255,100,.10);
-}
-
-.zlink-btn:active {
-    transform: scale(.98);
-}
-
-/* conteúdo do botão */
-.zlink-btn-content {
-    position: relative;
-    z-index: 2;
-
-    font-size: 21px;
-    font-weight: 700;
-
-    line-height: 1.25;
-}
-
-/* cores */
-.white {
-    color: #eeeeee;
-}
-
-.yellow {
-    color: #fcff01;
-}
-
-.green {
-    color: #04ff00;
-}
-
-.cyan {
-    color: #01ffff;
-}
-
-.orange {
-    color: #ffa400;
-}
-
-/* pequenos subtítulos */
-.btn-info {
-    display: block;
-    margin-top: 5px;
-
-    font-size: 11px;
-    font-weight: normal;
-
-    color: #888888;
-
-    letter-spacing: .6px;
-    text-transform: uppercase;
-}
-
-/* destaque principal */
-.zlink-main {
-    border-color: rgba(0,255,100,.30);
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(0,255,100,.10),
-            rgba(255,255,255,.03)
-        );
-}
-
-.zlink-main:hover {
-    border-color: #04ff00;
-
-    box-shadow:
-        0 15px 30px rgba(0,0,0,.5),
-        0 0 24px rgba(4,255,0,.18);
-}
-
-/* atualizações */
-.zlink-update {
-    margin-top: 20px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(0,255,70,.16),
-            rgba(0,255,255,.05)
-        );
-
-    border-color: rgba(89,255,0,.35);
-}
-
-.zlink-update:hover {
-    border-color: #59ff00;
-
-    box-shadow:
-        0 12px 30px rgba(0,0,0,.5),
-        0 0 28px rgba(89,255,0,.18);
-}
-
-/* divisor */
-.zlink-divider {
-    width: 70%;
-    height: 1px;
-
-    margin: 27px auto;
-
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,255,255,.18),
-        transparent
-    );
-}
-
-/* animação inicial */
-@keyframes zlinkAppear {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.zlink-downloads {
-    animation: zlinkAppear .7s ease-out;
-}
-
-/* mobile */
-@media (max-width: 650px) {
-    .zlink-downloads {
-        margin: 15px 5px;
-        padding: 25px 13px;
-        border-radius: 18px;
-    }
-
-    .zlink-grid {
-        grid-template-columns: 1fr;
-        gap: 11px;
-    }
-
-    .zlink-title {
-        font-size: 25px;
-    }
-
-    .zlink-btn {
-        min-height: 65px;
-    }
-
-    .zlink-btn-content {
-        font-size: 19px;
-    }
-
-    .zlink-cover img {
-        width: 200px;
-    }
-}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 15% 0,#102b4b 0,transparent 34%),linear-gradient(180deg,#07111f,#08111d 50%,#060d17);color:var(--text);font-family:Inter,Roboto,Arial,sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.shell{min-height:100vh}
+.login-wrap{min-height:100vh;display:grid;place-items:center;padding:24px}
+.login-card{width:min(560px,100%);background:linear-gradient(180deg,rgba(20,36,58,.97),rgba(12,24,40,.98));border:1px solid var(--line);border-radius:26px;padding:28px;box-shadow:var(--shadow)}
+.logo{width:58px;height:58px;border-radius:17px;background:linear-gradient(145deg,#2174d6,#6e55e8);display:grid;place-items:center;font-size:24px;font-weight:900;box-shadow:0 12px 30px rgba(52,116,214,.35)}
+h1{font-size:28px;margin:18px 0 8px}.lead{margin:0;color:var(--muted);line-height:1.55}.security-note{margin:20px 0;padding:13px 14px;border:1px solid #274c68;background:#0a1d2e;border-radius:14px;color:#bcd2e7;font-size:13px;line-height:1.5}
+.field{margin-top:16px}.field label{display:block;font-size:12px;color:#abc0d5;margin:0 0 7px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.input{width:100%;border:1px solid #34506e;background:#081523;color:var(--text);border-radius:13px;padding:13px 14px;outline:none;transition:.16s}.input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(74,163,255,.12)}
+.btn{border:1px solid transparent;border-radius:12px;padding:11px 15px;font-weight:750;color:white;background:#20354d;transition:.16s;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}.btn-primary{background:linear-gradient(135deg,#2879dc,#4aa3ff);box-shadow:0 8px 22px rgba(40,121,220,.25)}.btn-danger{background:#7f2635;border-color:#a63a4c}.btn-warn{background:#784d19;border-color:#a86e25}.btn-green{background:#126b47;border-color:#18885b}.btn-ghost{background:#101f31;border-color:#315070}.btn-sm{padding:7px 10px;border-radius:9px;font-size:12px}.btn-wide{width:100%;margin-top:20px;padding:13px 16px}
+.topbar{position:sticky;top:0;z-index:20;height:70px;background:rgba(7,17,31,.92);backdrop-filter:blur(16px);border-bottom:1px solid #20334b;display:flex;align-items:center;gap:14px;padding:0 20px}.top-logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,#2174d6,#6e55e8);display:grid;place-items:center;font-weight:900}.top-title{font-size:17px;font-weight:800}.top-sub{font-size:12px;color:var(--muted);margin-top:2px}.top-spacer{flex:1}.conn{display:flex;align-items:center;gap:7px;color:#aec0d3;font-size:12px}.dot{width:9px;height:9px;border-radius:50%;background:#68788a}.dot.ok{background:var(--green);box-shadow:0 0 12px rgba(45,212,126,.65)}.dot.err{background:var(--red)}
+.layout{max-width:1500px;margin:0 auto;padding:22px}.stats{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:12px}.stat{background:linear-gradient(180deg,#112038,#0d1a2c);border:1px solid var(--line);border-radius:16px;padding:16px}.stat span{display:block;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.07em}.stat strong{display:block;font-size:28px;margin-top:8px}.toolbar{margin-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.search{flex:1;min-width:250px}.tabs{display:flex;gap:6px;background:#0c1828;padding:5px;border:1px solid var(--line);border-radius:13px}.tab{border:0;background:transparent;color:#9db0c5;border-radius:9px;padding:9px 14px;font-weight:700}.tab.active{background:#1c3551;color:white}
+.panel{margin-top:15px;background:rgba(14,27,45,.9);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.15)}.panel-head{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}.panel-head h2{font-size:17px;margin:0}.count{color:#90a6bc;font-size:12px}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:940px}.table th,.table td{padding:13px 14px;text-align:left;border-bottom:1px solid #1e3148;vertical-align:middle}.table th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:#8fa5bb;background:#0c192a;position:sticky;top:0}.table td{font-size:13px}.table tr:hover td{background:rgba(32,61,91,.28)}.name{font-weight:800}.sub{font-size:11px;color:#8fa4ba;margin-top:4px}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;color:#a7bad0}.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;border:1px solid #36536f;background:#10233a;font-size:11px;color:#c7d9ec;white-space:nowrap}.badge.green{border-color:#276a4e;background:#0e3227;color:#83efb9}.badge.red{border-color:#7b3440;background:#35151c;color:#ff9fab}.badge.orange{border-color:#7d5a2d;background:#372713;color:#ffc378}.badge.purple{border-color:#624f9f;background:#261f42;color:#c5b8ff}.actions{display:flex;gap:6px;flex-wrap:wrap}.empty{padding:44px;text-align:center;color:#8398ae}
+.drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:40;opacity:0;pointer-events:none;transition:.2s}.drawer-backdrop.show{opacity:1;pointer-events:auto}.drawer{position:absolute;right:0;top:0;height:100%;width:min(720px,100%);background:#0b1727;border-left:1px solid #29415d;box-shadow:-20px 0 70px rgba(0,0,0,.35);transform:translateX(100%);transition:.24s;overflow:auto}.drawer-backdrop.show .drawer{transform:translateX(0)}.drawer-head{position:sticky;top:0;z-index:2;background:rgba(11,23,39,.96);backdrop-filter:blur(14px);display:flex;align-items:flex-start;gap:12px;padding:18px;border-bottom:1px solid var(--line)}.drawer-title{font-size:22px;font-weight:850}.drawer-body{padding:18px}.section-title{margin:20px 0 10px;font-size:14px;color:#b9cbe0;text-transform:uppercase;letter-spacing:.08em}.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.detail{background:#101f33;border:1px solid #28415d;border-radius:13px;padding:12px}.detail span{display:block;color:#89a0b8;font-size:10px;text-transform:uppercase}.detail strong{display:block;margin-top:6px;font-size:13px}.member{display:grid;grid-template-columns:minmax(150px,1fr) auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #20334a}.member:last-child{border:0}.member-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.danger-zone{margin-top:22px;padding:15px;border:1px solid #713340;background:#261219;border-radius:15px}.danger-zone h3{margin:0 0 6px;color:#ff9cab;font-size:14px}.danger-zone p{font-size:12px;color:#c998a1;line-height:1.5}
+.modal-backdrop{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.62);display:grid;place-items:center;padding:18px;opacity:0;pointer-events:none;transition:.18s}.modal-backdrop.show{opacity:1;pointer-events:auto}.modal{width:min(520px,100%);background:#101d2f;border:1px solid #34506c;border-radius:20px;box-shadow:var(--shadow);padding:20px}.modal h3{margin:0 0 8px;font-size:20px}.modal p{margin:0 0 15px;color:var(--muted);font-size:13px;line-height:1.5}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.checkbox{display:flex;gap:9px;align-items:flex-start;color:#c4d3e2;font-size:13px;margin-top:12px}.checkbox input{margin-top:2px}
+.audio-dock{position:fixed;left:50%;bottom:18px;z-index:35;transform:translateX(-50%) translateY(130%);width:min(840px,calc(100% - 24px));background:linear-gradient(180deg,#14263d,#0c1929);border:1px solid #365779;border-radius:18px;padding:13px 15px;box-shadow:0 20px 60px rgba(0,0,0,.4);display:flex;align-items:center;gap:12px;transition:.25s}.audio-dock.show{transform:translateX(-50%) translateY(0)}.audio-icon{width:44px;height:44px;border-radius:14px;background:#153c32;border:1px solid #28765a;display:grid;place-items:center}.audio-main{min-width:0;flex:1}.audio-title{font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.audio-status{color:#9eb3c8;font-size:12px;margin-top:3px}.volume{width:120px}.pulse{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:6px;box-shadow:0 0 0 rgba(45,212,126,.55);animation:pulse 1.4s infinite}@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(45,212,126,.55)}70%{box-shadow:0 0 0 9px rgba(45,212,126,0)}100%{box-shadow:0 0 0 0 rgba(45,212,126,0)}}
+.toast{position:fixed;z-index:90;right:20px;bottom:20px;max-width:min(420px,calc(100% - 40px));background:#16283e;border:1px solid #365572;color:white;border-radius:13px;padding:12px 14px;box-shadow:var(--shadow);transform:translateY(25px);opacity:0;pointer-events:none;transition:.2s;font-size:13px}.toast.show{transform:none;opacity:1}.toast.error{border-color:#8c4050;background:#321820}.toast.ok{border-color:#2b7053;background:#103326}
+.loading{opacity:.55;pointer-events:none}.kbd{font-family:ui-monospace,monospace;background:#172b42;border:1px solid #36516d;border-radius:6px;padding:2px 5px;font-size:11px}
+@media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.stats .stat:last-child{grid-column:1/-1}.detail-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.layout{padding:14px}.topbar{padding:0 12px}.top-sub{display:none}.stats{grid-template-columns:1fr 1fr}.toolbar{align-items:stretch}.search{width:100%;flex-basis:100%}.tabs{width:100%}.tab{flex:1}.drawer{width:100%}.detail-grid{grid-template-columns:1fr}.member{grid-template-columns:1fr}.member-actions{justify-content:flex-start}.audio-dock{align-items:flex-start;flex-wrap:wrap}.volume{width:100%}.login-card{padding:22px}}
 </style>
-
-
-<div class="zlink-downloads">
-
-    <!-- TÍTULO -->
-    <div class="zlink-title">
-        <span class="z">Z</span><span class="dash">-</span><span class="link">Link</span>
-        <span class="downloads">Downloads</span>
-    </div>
-
-    <div class="zlink-subtitle">
-        Aplicativos, ferramentas e informações oficiais
-    </div>
-
-
-    <!-- CAPA -->
-    <div class="zlink-cover">
-
-        <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyDtNJJUyIeSmYry8-C7mAQW4Dxz72PDNr7-jTpmjRK0XkVLgogJ-mjf-YY4iMmWYimFEnxnoLan_08uprxw8BwMoAxgzv4G8kdxCYlFHTMNUAB4ILN9KKOedgs7Xjw47Qne2xW1soksRs1N8-R5e0ay1jN9tpelVxYFcJ48DC2Y6yKNvQezs3b1viMlhw/s1536/Capa.png">
-
-            <img
-                src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyDtNJJUyIeSmYry8-C7mAQW4Dxz72PDNr7-jTpmjRK0XkVLgogJ-mjf-YY4iMmWYimFEnxnoLan_08uprxw8BwMoAxgzv4G8kdxCYlFHTMNUAB4ILN9KKOedgs7Xjw47Qne2xW1soksRs1N8-R5e0ay1jN9tpelVxYFcJ48DC2Y6yKNvQezs3b1viMlhw/s320/Capa.png"
-                alt="Z-Link"
-            />
-
-        </a>
-
-    </div>
-
-
-    <div class="zlink-grid">
-
-        <!-- Z-LINK TALK -->
-        <a
-            class="zlink-btn zlink-main"
-            href="https://github.com/dinizrfoficial/update/releases/download/apk/app-release.apk">
-
-            <div class="zlink-btn-content">
-
-                <span class="white">Z</span><span class="yellow">-</span><span class="white">Link</span>
-                <span class="yellow">Talk</span>
-                <span class="green">APP</span>
-
-                <span class="btn-info">
-                    Baixar aplicativo
-                </span>
-
-            </div>
-
-        </a>
-
-
-        <!-- FICHA TÉCNICA -->
-        <a
-            class="zlink-btn"
-            href="https://diniz-rf.github.io/Z-LINK-V5.1---Ficha-T-cnica/">
-
-            <div class="zlink-btn-content">
-
-                <span class="yellow">Ficha Técnica</span><br>
-
-                <span class="white">Z</span><span class="yellow">-</span><span class="white">Link</span>
-                <span class="green">V5.1</span>
-
-                <span class="btn-info">
-                    Informações do produto
-                </span>
-
-            </div>
-
-        </a>
-
-
-        <!-- Z-LINK ECHO -->
-        <a
-            class="zlink-btn"
-            href="https://diniz-rf.github.io/Z-Link-Echo-Web/">
-
-            <div class="zlink-btn-content">
-
-                <span class="white">Z</span><span class="yellow">-</span><span class="white">Link</span>
-                <span class="cyan">Echo</span>
-                <span class="green">Web</span>
-
-                <span class="btn-info">
-                    Acessar Echo Web
-                </span>
-
-            </div>
-
-        </a>
-
-
-        <!-- ANYDESK -->
-        <a
-            class="zlink-btn"
-            href="https://download.anydesk.com/anydesk.apk">
-
-            <div class="zlink-btn-content">
-
-                <span class="white">Any</span><span class="cyan">Desk</span>
-
-                <span class="btn-info">
-                    Baixar para Android
-                </span>
-
-            </div>
-
-        </a>
-
-
-        <!-- ZELLO LINK NEW -->
-        <a
-            class="zlink-btn"
-            href="https://github.com/Diniz-RF/APPS/releases/download/V9.9.9/Zello-Link-7-12-1.apk">
-
-            <div class="zlink-btn-content">
-
-                <span class="orange">Zello</span><span class="white">-</span><span class="cyan">Link</span>
-                <span class="green">New</span>
-
-                <span class="btn-info">
-                    Versão completa
-                </span>
-
-            </div>
-
-        </a>
-
-
-        <!-- ZELLO LINK LITE -->
-        <a
-            class="zlink-btn"
-            href="https://github.com/Diniz-RF/APPS/raw/refs/heads/main/Zello-Link-5-1-9.apk">
-
-            <div class="zlink-btn-content">
-
-                <span class="orange">Zello</span><span class="white">-</span><span class="cyan">Link</span>
-                <span class="cyan">LITE</span>
-
-                <span class="btn-info">
-                    Versão leve
-                </span>
-
-            </div>
-
-        </a>
-
-    </div>
-
-
-    <div class="zlink-divider"></div>
-
-
-    <!-- SAFMEDIA -->
-    <a
-        class="zlink-btn"
-        href="https://diniz-rf.github.io/safmedia/">
-
-        <div class="zlink-btn-content">
-
-            <span class="yellow">
-                Como desativar SafMedia
-            </span>
-
-            <span class="btn-info">
-                Tutorial
-            </span>
-
-        </div>
-
-    </a>
-
-
-    <!-- ATUALIZAÇÕES -->
-    <a
-        class="zlink-btn zlink-update"
-        href="https://diniz-rf.github.io/loja/">
-
-        <div class="zlink-btn-content">
-
-            <span class="green">
-                ⟳ ATUALIZAÇÕES
-            </span>
-
-            <span class="btn-info">
-                Ver versões e novidades
-            </span>
-
-        </div>
-
-    </a>
-
+</head>
+<body>
+<div id="loginView" class="login-wrap">
+  <div class="login-card">
+    <div class="logo">Z</div>
+    <h1>Central de Controle Z-Link Talk</h1>
+    <p class="lead">Painel mestre para administração global de canais, usuários, moderação, bloqueios e monitoramento de áudio.</p>
+    <div class="security-note"><b>Segurança:</b> este arquivo pode ficar público no GitHub Pages, mas o token mestre não deve ser gravado no HTML. Informe-o somente ao entrar. Ele fica apenas na sessão atual do navegador.</div>
+    <div class="field"><label>Servidor</label><input id="serverInput" class="input" value="https://servidor-kw2o.onrender.com" spellcheck="false"></div>
+    <div class="field"><label>Token mestre</label><input id="tokenInput" class="input" type="password" autocomplete="off" placeholder="ZLINK_MASTER_ADMIN_TOKEN"></div>
+    <button id="loginBtn" class="btn btn-primary btn-wide">Entrar no painel</button>
+    <div id="loginError" style="margin-top:12px;color:#ff99a8;font-size:13px"></div>
+  </div>
 </div>
+
+<div id="appView" class="shell hidden">
+  <header class="topbar">
+    <div class="top-logo">Z</div>
+    <div><div class="top-title">Z-Link Control Center</div><div class="top-sub">Administração mestre</div></div>
+    <div class="top-spacer"></div>
+    <div class="conn"><span id="connDot" class="dot"></span><span id="connText">Conectando</span></div>
+    <button id="refreshBtn" class="btn btn-ghost btn-sm">Atualizar</button>
+    <button id="logoutBtn" class="btn btn-ghost btn-sm">Sair</button>
+  </header>
+
+  <main id="main" class="layout">
+    <section class="stats">
+      <div class="stat"><span>Usuários</span><strong id="statUsers">0</strong></div>
+      <div class="stat"><span>Online</span><strong id="statOnline">0</strong></div>
+      <div class="stat"><span>Contas bloqueadas</span><strong id="statBanned">0</strong></div>
+      <div class="stat"><span>Canais</span><strong id="statChannels">0</strong></div>
+      <div class="stat"><span>Canais transmitindo</span><strong id="statTx">0</strong></div>
+    </section>
+
+    <section class="toolbar">
+      <input id="searchInput" class="input search" placeholder="Pesquisar por nome, UID, e-mail ou ID do canal">
+      <div class="tabs">
+        <button class="tab active" data-tab="channels">Canais</button>
+        <button class="tab" data-tab="users">Usuários</button>
+      </div>
+    </section>
+
+    <section id="channelsPanel" class="panel">
+      <div class="panel-head"><h2>Todos os canais</h2><span id="channelCount" class="count"></span></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Canal</th><th>Tipo</th><th>Proprietário</th><th>Membros</th><th>Status</th><th>Ações</th></tr></thead><tbody id="channelsBody"></tbody></table></div>
+    </section>
+
+    <section id="usersPanel" class="panel hidden">
+      <div class="panel-head"><h2>Todos os usuários</h2><span id="userCount" class="count"></span></div>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Usuário</th><th>E-mail</th><th>Conexão</th><th>Canais</th><th>Conta</th><th>Ações</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+    </section>
+  </main>
+</div>
+
+<div id="drawerBackdrop" class="drawer-backdrop">
+  <aside class="drawer">
+    <div class="drawer-head">
+      <div style="flex:1"><div id="drawerTitle" class="drawer-title"></div><div id="drawerSub" class="sub"></div></div>
+      <button id="drawerClose" class="btn btn-ghost btn-sm">Fechar</button>
+    </div>
+    <div id="drawerBody" class="drawer-body"></div>
+  </aside>
+</div>
+
+<div id="modalBackdrop" class="modal-backdrop">
+  <div class="modal">
+    <h3 id="modalTitle"></h3>
+    <p id="modalText"></p>
+    <div id="modalFields"></div>
+    <div class="modal-actions"><button id="modalCancel" class="btn btn-ghost">Cancelar</button><button id="modalOk" class="btn btn-primary">Confirmar</button></div>
+  </div>
+</div>
+
+<div id="audioDock" class="audio-dock">
+  <div class="audio-icon">🎧</div>
+  <div class="audio-main"><div id="audioTitle" class="audio-title">Monitor de canal</div><div id="audioStatus" class="audio-status">Aguardando</div></div>
+  <input id="volumeRange" class="volume" type="range" min="0" max="1" step="0.05" value="0.9" title="Volume">
+  <button id="audioStop" class="btn btn-danger btn-sm">Parar áudio</button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+var state={server:'',token:'',overview:null,tab:'channels',search:'',selectedChannelId:null,loading:false};
+var $=function(id){return document.getElementById(id)};
+var els={
+  loginView:$('loginView'),appView:$('appView'),serverInput:$('serverInput'),tokenInput:$('tokenInput'),loginBtn:$('loginBtn'),loginError:$('loginError'),
+  connDot:$('connDot'),connText:$('connText'),refreshBtn:$('refreshBtn'),logoutBtn:$('logoutBtn'),searchInput:$('searchInput'),channelsPanel:$('channelsPanel'),usersPanel:$('usersPanel'),channelsBody:$('channelsBody'),usersBody:$('usersBody'),channelCount:$('channelCount'),userCount:$('userCount'),
+  statUsers:$('statUsers'),statOnline:$('statOnline'),statBanned:$('statBanned'),statChannels:$('statChannels'),statTx:$('statTx'),drawerBackdrop:$('drawerBackdrop'),drawerTitle:$('drawerTitle'),drawerSub:$('drawerSub'),drawerBody:$('drawerBody'),drawerClose:$('drawerClose'),modalBackdrop:$('modalBackdrop'),modalTitle:$('modalTitle'),modalText:$('modalText'),modalFields:$('modalFields'),modalCancel:$('modalCancel'),modalOk:$('modalOk'),toast:$('toast'),main:$('main'),audioDock:$('audioDock'),audioTitle:$('audioTitle'),audioStatus:$('audioStatus'),volumeRange:$('volumeRange'),audioStop:$('audioStop')
+};
+
+function esc(v){return String(v==null?'':v).replace(/[&<>'"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]});}
+function normalizeServer(v){return String(v||'').trim().replace(/\/+$/,'');}
+function toast(msg,type){els.toast.textContent=msg;els.toast.className='toast show '+(type||'');clearTimeout(toast.t);toast.t=setTimeout(function(){els.toast.className='toast';},3200);}
+function setConnection(ok,text){els.connDot.className='dot '+(ok?'ok':'err');els.connText.textContent=text;}
+function setLoading(v){state.loading=v;els.main.classList.toggle('loading',v);els.refreshBtn.disabled=v;}
+function fmtDate(ts){if(!ts)return '—';try{return new Date(ts).toLocaleString('pt-BR');}catch(e){return '—';}}
+function roleLabel(role){return role==='owner'?'Administrador':role==='moderator'?'Moderador':'Usuário';}
+function badge(text,cls){return '<span class="badge '+(cls||'')+'">'+esc(text)+'</span>';}
+
+async function api(path,method,body){
+  var response=await fetch(state.server+path,{method:method||'GET',headers:{'Authorization':'Bearer '+state.token,'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,cache:'no-store'});
+  var data={};try{data=await response.json();}catch(e){}
+  if(!response.ok||data.success===false){throw new Error(data.error||('Erro HTTP '+response.status));}
+  return data;
+}
+
+async function login(){
+  var server=normalizeServer(els.serverInput.value),token=els.tokenInput.value.trim();
+  if(!server||!token){els.loginError.textContent='Informe o servidor e o token mestre.';return;}
+  els.loginBtn.disabled=true;els.loginError.textContent='';
+  state.server=server;state.token=token;
+  try{
+    var data=await api('/api/master/overview');
+    state.overview=data;
+    sessionStorage.setItem('zlinkMasterServer',server);
+    sessionStorage.setItem('zlinkMasterToken',token);
+    els.loginView.classList.add('hidden');els.appView.classList.remove('hidden');
+    setConnection(true,'Conectado');render();startAutoRefresh();
+  }catch(e){state.token='';setConnection(false,'Falha');els.loginError.textContent=e.message;}
+  els.loginBtn.disabled=false;
+}
+
+function logout(){audio.stop();stopAutoRefresh();sessionStorage.removeItem('zlinkMasterToken');state.token='';state.overview=null;els.appView.classList.add('hidden');els.loginView.classList.remove('hidden');els.tokenInput.value='';}
+
+async function refresh(silent){
+  if(!state.token||state.loading)return;
+  if(!silent)setLoading(true);
+  try{state.overview=await api('/api/master/overview');setConnection(true,'Conectado');render();}
+  catch(e){setConnection(false,'Erro');if(!silent)toast(e.message,'error');}
+  if(!silent)setLoading(false);
+}
+var refreshTimer=null;
+function startAutoRefresh(){stopAutoRefresh();refreshTimer=setInterval(function(){refresh(true);},10000);}
+function stopAutoRefresh(){if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null;}}
+
+function render(){
+  var o=state.overview;if(!o)return;
+  els.statUsers.textContent=o.stats.users;els.statOnline.textContent=o.stats.onlineUsers;els.statBanned.textContent=o.stats.bannedUsers;els.statChannels.textContent=o.stats.channels;els.statTx.textContent=o.stats.activeChannels;
+  renderChannels();renderUsers();
+  if(state.selectedChannelId&&els.drawerBackdrop.classList.contains('show'))openChannel(state.selectedChannelId,true);
+}
+
+function matchSearch(values){var q=state.search.toLowerCase();if(!q)return true;return values.some(function(v){return String(v||'').toLowerCase().indexOf(q)>=0;});}
+function renderChannels(){
+  var rows=(state.overview.channels||[]).filter(function(c){return matchSearch([c.name,c.id,c.ownerName,c.ownerUid,c.type]);});
+  els.channelCount.textContent=rows.length+' exibidos';
+  if(!rows.length){els.channelsBody.innerHTML='<tr><td colspan="6" class="empty">Nenhum canal encontrado.</td></tr>';return;}
+  els.channelsBody.innerHTML=rows.map(function(c){
+    var tx=c.activeTransmission?badge('Transmitindo: '+c.activeTransmission.name,'green'):badge('Livre','');
+    return '<tr><td><div class="name">'+esc(c.name)+'</div><div class="mono">'+esc(c.id)+'</div></td><td>'+badge(c.type==='public'?'Público':'Privado',c.type==='public'?'':'purple')+'</td><td><div class="name">'+esc(c.ownerName)+'</div><div class="mono">'+esc(c.ownerUid)+'</div></td><td>'+c.memberCount+' total · '+c.onlineCount+' online</td><td>'+tx+'</td><td><div class="actions"><button class="btn btn-ghost btn-sm" data-action="open-channel" data-id="'+esc(c.id)+'">Administrar</button><button class="btn btn-green btn-sm" data-action="listen" data-id="'+esc(c.id)+'">Ouvir</button><button class="btn btn-ghost btn-sm" data-action="rename-channel" data-id="'+esc(c.id)+'">Renomear</button></div></td></tr>';
+  }).join('');
+}
+function renderUsers(){
+  var rows=(state.overview.users||[]).filter(function(u){return matchSearch([u.name,u.uid,u.email,u.activeChannelId]);});
+  els.userCount.textContent=rows.length+' exibidos';
+  if(!rows.length){els.usersBody.innerHTML='<tr><td colspan="6" class="empty">Nenhum usuário encontrado.</td></tr>';return;}
+  els.usersBody.innerHTML=rows.map(function(u){
+    var conn=u.online?badge('Online','green'):badge('Offline','');
+    var acc=u.banned?badge('Bloqueada','red'):badge('Ativa','green');
+    return '<tr><td><div class="name">'+esc(u.name)+'</div><div class="mono">'+esc(u.uid)+'</div></td><td>'+esc(u.email||'—')+'</td><td>'+conn+'</td><td>'+u.channelCount+'</td><td>'+acc+(u.banReason?'<div class="sub">'+esc(u.banReason)+'</div>':'')+'</td><td><div class="actions"><button class="btn btn-ghost btn-sm" data-action="rename-user" data-id="'+esc(u.uid)+'">Renomear</button>'+(u.banned?'<button class="btn btn-green btn-sm" data-action="unban-user" data-id="'+esc(u.uid)+'">Desbloquear</button>':'<button class="btn btn-danger btn-sm" data-action="ban-user" data-id="'+esc(u.uid)+'">Banir conta</button>')+'</div></td></tr>';
+  }).join('');
+}
+
+function getChannel(id){return (state.overview.channels||[]).find(function(c){return c.id===id;});}
+function getUser(id){return (state.overview.users||[]).find(function(u){return u.uid===id;});}
+function openChannel(id,rerender){
+  var c=getChannel(id);if(!c)return;state.selectedChannelId=id;
+  els.drawerTitle.textContent=c.name;els.drawerSub.textContent='ID '+c.id+' · '+(c.type==='public'?'Público':'Privado');
+  var tx=c.activeTransmission?badge('Transmitindo agora: '+c.activeTransmission.name,'green'):badge('Canal livre','');
+  var ownerOptions=c.members.filter(function(m){return m.uid!==c.ownerUid&&!m.banned;}).map(function(m){return '<option value="'+esc(m.uid)+'">'+esc(m.name)+' · '+esc(m.uid)+'</option>';}).join('');
+  var members=c.members.map(function(m){
+    var role=badge(roleLabel(m.role),m.role==='owner'?'orange':m.role==='moderator'?'purple':'');
+    var flags=(m.online?badge('Online','green'):'')+(m.blocked?badge('Bloqueado','red'):'')+(!m.blocked&&m.trusted?badge('Confiável','green'):'');
+    var actions='';
+    if(m.role!=='owner'){
+      actions+=(m.role==='moderator'?'<button class="btn btn-ghost btn-sm" data-action="mod-off" data-user="'+esc(m.uid)+'">Remover moderação</button>':'<button class="btn btn-ghost btn-sm" data-action="mod-on" data-user="'+esc(m.uid)+'">Tornar moderador</button>');
+      actions+=(m.blocked?'<button class="btn btn-green btn-sm" data-action="channel-unblock" data-user="'+esc(m.uid)+'">Desbloquear</button>':'<button class="btn btn-warn btn-sm" data-action="channel-block" data-user="'+esc(m.uid)+'">Bloquear</button>');
+      actions+='<button class="btn btn-danger btn-sm" data-action="remove-member" data-user="'+esc(m.uid)+'">Remover</button>';
+    }
+    return '<div class="member"><div><div class="name">'+esc(m.name)+'</div><div class="mono">'+esc(m.uid)+'</div><div style="margin-top:6px">'+role+' '+flags+'</div></div><div class="member-actions">'+actions+'</div></div>';
+  }).join('')||'<div class="empty">Nenhum participante.</div>';
+  els.drawerBody.innerHTML='<div class="detail-grid"><div class="detail"><span>Proprietário</span><strong>'+esc(c.ownerName)+'</strong></div><div class="detail"><span>Membros</span><strong>'+c.memberCount+' · '+c.onlineCount+' online</strong></div><div class="detail"><span>Estado</span><strong>'+tx+'</strong></div></div>'+
+    '<div class="section-title">Ações do canal</div><div class="actions"><button class="btn btn-green" data-action="listen" data-id="'+esc(c.id)+'">Ouvir canal</button><button class="btn btn-ghost" data-action="rename-channel" data-id="'+esc(c.id)+'">Alterar nome</button></div>'+
+    '<div class="section-title">Transferir proprietário</div><div class="field"><label>Novo proprietário</label><select id="ownerSelect" class="input"><option value="">Selecione...</option>'+ownerOptions+'</select></div><label class="checkbox"><input id="keepOldMod" type="checkbox" checked> Manter o proprietário atual como Moderador após a transferência.</label><button class="btn btn-warn" style="margin-top:12px" data-action="transfer-owner">Transferir propriedade</button>'+
+    '<div class="section-title">Participantes</div><div>'+members+'</div>'+
+    '<div class="danger-zone"><h3>Zona de risco</h3><p>A exclusão do canal afeta todos os participantes e não deve ser usada sem necessidade.</p><button class="btn btn-danger" data-action="delete-channel" data-id="'+esc(c.id)+'">Excluir canal</button></div>';
+  if(!rerender)els.drawerBackdrop.classList.add('show');
+}
+function closeDrawer(){els.drawerBackdrop.classList.remove('show');state.selectedChannelId=null;}
+
+var modalResolve=null;
+function modal(opts){
+  els.modalTitle.textContent=opts.title||'Confirmar';els.modalText.textContent=opts.text||'';els.modalFields.innerHTML=opts.html||'';els.modalOk.textContent=opts.okText||'Confirmar';els.modalOk.className='btn '+(opts.danger?'btn-danger':'btn-primary');els.modalBackdrop.classList.add('show');
+  return new Promise(function(resolve){modalResolve=resolve;});
+}
+function modalDone(ok){els.modalBackdrop.classList.remove('show');var r=modalResolve;modalResolve=null;if(r)r(ok);}
+
+async function actionRenameUser(uid){var u=getUser(uid);if(!u)return;var ok=await modal({title:'Alterar nome do usuário',text:'UID: '+uid,html:'<div class="field"><label>Novo nome</label><input id="modalName" class="input" value="'+esc(u.name)+'" maxlength="32"></div>',okText:'Salvar'});if(!ok)return;var name=$('modalName').value.trim();if(!name)return;await runAction('/api/master/users/rename',{userId:uid,username:name},'Nome atualizado.');}
+async function actionBanUser(uid){var u=getUser(uid);if(!u)return;var ok=await modal({title:'Banir conta',text:'A conta ficará desabilitada e não poderá entrar novamente até ser desbloqueada.',html:'<div class="field"><label>Motivo</label><textarea id="banReason" class="input" rows="3" placeholder="Motivo administrativo"></textarea></div>',okText:'Banir conta',danger:true});if(!ok)return;await runAction('/api/master/users/ban',{userId:uid,reason:$('banReason').value.trim()},'Conta bloqueada.');}
+async function actionUnbanUser(uid){var ok=await modal({title:'Desbloquear conta',text:'O usuário poderá autenticar novamente no aplicativo.',okText:'Desbloquear'});if(ok)await runAction('/api/master/users/unban',{userId:uid},'Conta desbloqueada.');}
+async function actionRenameChannel(id){var c=getChannel(id);if(!c)return;var ok=await modal({title:'Alterar nome do canal',text:'ID: '+id,html:'<div class="field"><label>Novo nome</label><input id="modalName" class="input" value="'+esc(c.name)+'" maxlength="32"></div>',okText:'Salvar'});if(!ok)return;var name=$('modalName').value.trim();if(!name)return;await runAction('/api/master/channels/rename',{channelId:id,name:name},'Canal atualizado.');}
+async function runMemberAction(path,userId,extra,msg,confirmText){if(confirmText){var ok=await modal({title:'Confirmar ação',text:confirmText,okText:'Confirmar',danger:path.indexOf('remove')>=0||path.indexOf('block')>=0});if(!ok)return;}var body=Object.assign({channelId:state.selectedChannelId,userId:userId},extra||{});await runAction(path,body,msg);}
+async function transferOwner(){var select=$('ownerSelect');if(!select||!select.value){toast('Selecione o novo proprietário.','error');return;}var user=getUser(select.value);var ok=await modal({title:'Transferir propriedade',text:'O usuário '+(user?user.name:select.value)+' passará a ser o Administrador/proprietário principal deste canal.',okText:'Transferir',danger:true});if(!ok)return;await runAction('/api/master/channels/transfer-owner',{channelId:state.selectedChannelId,userId:select.value,keepOldAsModerator:$('keepOldMod')?$('keepOldMod').checked:true},'Propriedade transferida.');}
+async function deleteChannel(id){var c=getChannel(id);if(!c)return;var ok=await modal({title:'Excluir canal permanentemente',text:'O canal “'+c.name+'” será removido para todos os participantes.',html:'<div class="field"><label>Digite EXCLUIR para confirmar</label><input id="deleteConfirm" class="input" autocomplete="off"></div>',okText:'Excluir canal',danger:true});if(!ok)return;if(String($('deleteConfirm').value||'').trim().toUpperCase()!=='EXCLUIR'){toast('Confirmação incorreta.','error');return;}await runAction('/api/master/channels/delete',{channelId:id},'Canal excluído.');closeDrawer();}
+async function runAction(path,body,success){setLoading(true);try{await api(path,'POST',body);toast(success,'ok');await refresh(true);}catch(e){toast(e.message,'error');}setLoading(false);}
+
+function clickAction(e){var b=e.target.closest('[data-action]');if(!b)return;var a=b.getAttribute('data-action'),id=b.getAttribute('data-id'),uid=b.getAttribute('data-user');
+  if(a==='open-channel')openChannel(id);else if(a==='listen')audio.start(id);else if(a==='rename-channel')actionRenameChannel(id);else if(a==='rename-user')actionRenameUser(id);else if(a==='ban-user')actionBanUser(id);else if(a==='unban-user')actionUnbanUser(id);else if(a==='mod-on')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:true},'Usuário promovido a Moderador.');else if(a==='mod-off')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:false},'Moderação removida.');else if(a==='channel-block')runMemberAction('/api/master/channels/block-user',uid,{},'Usuário bloqueado no canal.','O usuário será impedido de participar deste canal.');else if(a==='channel-unblock')runMemberAction('/api/master/channels/unblock-user',uid,{},'Usuário desbloqueado no canal.');else if(a==='remove-member')runMemberAction('/api/master/channels/remove-user',uid,{},'Usuário removido do canal.','O usuário será removido da lista deste canal.');else if(a==='transfer-owner')transferOwner();else if(a==='delete-channel')deleteChannel(id||state.selectedChannelId);
+}
+
+var audio={
+  ws:null,
+  ctx:null,
+  gain:null,
+  nextTime:0,
+  channelId:null,
+  channelName:'',
+  speaker:'',
+  pcmRemainder:null,
+
+  async ensureAudio(){
+    if(!window.AudioContext&&!window.webkitAudioContext){
+      throw new Error('Este navegador não possui Web Audio compatível.');
+    }
+
+    if(!this.ctx){
+      this.ctx=new (window.AudioContext||window.webkitAudioContext)();
+      this.gain=this.ctx.createGain();
+      this.gain.gain.value=parseFloat(els.volumeRange.value||'0.9');
+      this.gain.connect(this.ctx.destination);
+    }
+
+    if(this.ctx.state==='suspended'){
+      await this.ctx.resume();
+    }
+
+    this.nextTime=this.ctx.currentTime+0.08;
+    this.pcmRemainder=null;
+  },
+
+  async start(channelId){
+    var c=getChannel(channelId);
+    if(!c)return;
+
+    this.stop();
+    this.channelId=channelId;
+    this.channelName=c.name;
+
+    els.audioTitle.textContent='Monitorando: '+c.name;
+    els.audioStatus.textContent='Preparando áudio AMR-WB...';
+    els.audioDock.classList.add('show');
+
+    try{
+      await this.ensureAudio();
+    }catch(e){
+      els.audioStatus.textContent=e.message;
+      toast(e.message,'error');
+      return;
+    }
+
+    var wsUrl=state.server
+      .replace(/^https:/i,'wss:')
+      .replace(/^http:/i,'ws:');
+
+    var self=this;
+    this.ws=new WebSocket(wsUrl);
+    this.ws.binaryType='arraybuffer';
+
+    this.ws.onopen=function(){
+      self.ws.send(JSON.stringify({
+        type:'admin_monitor_identify',
+        adminToken:state.token
+      }));
+    };
+
+    this.ws.onmessage=function(ev){
+      if(typeof ev.data==='string'){
+        var m;
+
+        try{
+          m=JSON.parse(ev.data);
+        }catch(e){
+          return;
+        }
+
+        if(m.type==='admin_monitor_ready'){
+          self.ws.send(JSON.stringify({
+            type:'admin_monitor_select',
+            channelId:channelId
+          }));
+        }else if(m.type==='admin_monitor_selected'){
+          els.audioStatus.innerHTML=
+            '<span class="pulse"></span>Aguardando transmissão';
+        }else if(m.type==='admin_monitor_tx_start'){
+          self.speaker=m.name||m.userId||'Usuário';
+
+          if(self.ctx){
+            self.nextTime=Math.max(
+              self.ctx.currentTime+0.08,
+              self.nextTime
+            );
+
+            /*
+             * Se ficou uma fila antiga grande (aba suspensa, troca de janela),
+             * não reproduz áudio atrasado por vários segundos.
+             */
+            if(self.nextTime>self.ctx.currentTime+0.75){
+              self.nextTime=self.ctx.currentTime+0.08;
+            }
+          }
+
+          self.pcmRemainder=null;
+
+          els.audioStatus.innerHTML=
+            '<span class="pulse"></span>Ouvindo '+esc(self.speaker);
+        }else if(m.type==='admin_monitor_tx_stop'){
+          els.audioStatus.innerHTML=
+            '<span class="pulse"></span>Aguardando transmissão';
+          self.speaker='';
+          self.pcmRemainder=null;
+        }else if(m.type==='admin_monitor_audio_error'){
+          els.audioStatus.textContent=
+            m.message||'Falha ao decodificar AMR-WB no servidor';
+          toast(
+            m.message||'Falha no áudio do monitor.',
+            'error'
+          );
+        }else if(
+          m.type==='admin_monitor_denied'||
+          m.type==='admin_monitor_error'
+        ){
+          els.audioStatus.textContent=
+            m.message||'Acesso ao áudio negado';
+          toast(
+            m.message||'Falha no monitor de áudio',
+            'error'
+          );
+        }
+
+        return;
+      }
+
+      self.feedPcm(ev.data);
+    };
+
+    this.ws.onerror=function(){
+      els.audioStatus.textContent='Falha na conexão de áudio';
+    };
+
+    this.ws.onclose=function(){
+      if(self.channelId){
+        els.audioStatus.textContent='Monitor de áudio desconectado';
+      }
+    };
+  },
+
+  feedPcm(buffer){
+    if(!this.ctx||!buffer)return;
+
+    var u8=new Uint8Array(buffer);
+
+    /*
+     * Cabeçalho ZLPCM v1 enviado pelo server.js:
+     * 5A 4C 50 43 4D 01
+     */
+    if(
+      u8.length<=6||
+      u8[0]!==0x5A||
+      u8[1]!==0x4C||
+      u8[2]!==0x50||
+      u8[3]!==0x43||
+      u8[4]!==0x4D||
+      u8[5]!==0x01
+    ){
+      return;
+    }
+
+    var payload=u8.slice(6);
+
+    /*
+     * PCM S16LE precisa sempre de pares de bytes. Guarda um eventual byte
+     * incompleto entre mensagens, embora o FFmpeg normalmente entregue
+     * blocos alinhados.
+     */
+    if(this.pcmRemainder&&this.pcmRemainder.length){
+      var joined=new Uint8Array(
+        this.pcmRemainder.length+payload.length
+      );
+
+      joined.set(this.pcmRemainder,0);
+      joined.set(payload,this.pcmRemainder.length);
+      payload=joined;
+      this.pcmRemainder=null;
+    }
+
+    if(payload.length&1){
+      this.pcmRemainder=payload.slice(payload.length-1);
+      payload=payload.slice(0,payload.length-1);
+    }
+
+    if(payload.length<2)return;
+
+    var samples=payload.length>>1;
+    var pcm=new Float32Array(samples);
+    var view=new DataView(
+      payload.buffer,
+      payload.byteOffset,
+      payload.byteLength
+    );
+
+    for(var i=0;i<samples;i++){
+      pcm[i]=view.getInt16(i*2,true)/32768;
+    }
+
+    var audioBuffer=this.ctx.createBuffer(
+      1,
+      samples,
+      16000
+    );
+
+    audioBuffer.copyToChannel(
+      pcm,
+      0
+    );
+
+    var src=this.ctx.createBufferSource();
+    src.buffer=audioBuffer;
+    src.connect(this.gain);
+
+    var now=this.ctx.currentTime;
+
+    if(
+      this.nextTime<now||
+      this.nextTime>now+0.75
+    ){
+      this.nextTime=now+0.06;
+    }
+
+    src.start(this.nextTime);
+    this.nextTime+=audioBuffer.duration;
+  },
+
+  stop(){
+    if(this.ws){
+      try{
+        if(this.ws.readyState===1){
+          this.ws.send(JSON.stringify({
+            type:'admin_monitor_stop'
+          }));
+        }
+
+        this.ws.close();
+      }catch(e){}
+
+      this.ws=null;
+    }
+
+    this.channelId=null;
+    this.speaker='';
+    this.pcmRemainder=null;
+
+    if(this.ctx){
+      this.nextTime=this.ctx.currentTime;
+    }
+
+    els.audioDock.classList.remove('show');
+  },
+
+  setVolume(v){
+    if(this.gain){
+      this.gain.gain.value=parseFloat(v);
+    }
+  }
+};
+
+els.loginBtn.addEventListener('click',login);els.tokenInput.addEventListener('keydown',function(e){if(e.key==='Enter')login();});els.refreshBtn.addEventListener('click',function(){refresh(false);});els.logoutBtn.addEventListener('click',logout);els.searchInput.addEventListener('input',function(){state.search=this.value.trim();renderChannels();renderUsers();});
+document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});t.classList.add('active');state.tab=t.getAttribute('data-tab');els.channelsPanel.classList.toggle('hidden',state.tab!=='channels');els.usersPanel.classList.toggle('hidden',state.tab!=='users');});});
+els.channelsBody.addEventListener('click',clickAction);els.usersBody.addEventListener('click',clickAction);els.drawerBody.addEventListener('click',clickAction);els.drawerClose.addEventListener('click',closeDrawer);els.drawerBackdrop.addEventListener('click',function(e){if(e.target===els.drawerBackdrop)closeDrawer();});els.modalCancel.addEventListener('click',function(){modalDone(false);});els.modalOk.addEventListener('click',function(){modalDone(true);});els.modalBackdrop.addEventListener('click',function(e){if(e.target===els.modalBackdrop)modalDone(false);});els.audioStop.addEventListener('click',function(){audio.stop();});els.volumeRange.addEventListener('input',function(){audio.setVolume(this.value);});
+window.addEventListener('keydown',function(e){if(e.key==='Escape'){if(els.modalBackdrop.classList.contains('show'))modalDone(false);else if(els.drawerBackdrop.classList.contains('show'))closeDrawer();}});
+window.addEventListener('beforeunload',function(){audio.stop();});
+
+var savedServer=sessionStorage.getItem('zlinkMasterServer'),savedToken=sessionStorage.getItem('zlinkMasterToken');if(savedServer)els.serverInput.value=savedServer;if(savedToken){els.tokenInput.value=savedToken;setTimeout(login,50);}
+})();
+</script>
+</body>
+</html>
