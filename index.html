@@ -31,6 +31,7 @@ h1{font-size:28px;margin:18px 0 8px}.lead{margin:0;color:var(--muted);line-heigh
 .drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:40;opacity:0;pointer-events:none;transition:.2s}.drawer-backdrop.show{opacity:1;pointer-events:auto}.drawer{position:absolute;right:0;top:0;height:100%;width:min(720px,100%);background:#0b1727;border-left:1px solid #29415d;box-shadow:-20px 0 70px rgba(0,0,0,.35);transform:translateX(100%);transition:.24s;overflow:auto}.drawer-backdrop.show .drawer{transform:translateX(0)}.drawer-head{position:sticky;top:0;z-index:2;background:rgba(11,23,39,.96);backdrop-filter:blur(14px);display:flex;align-items:flex-start;gap:12px;padding:18px;border-bottom:1px solid var(--line)}.drawer-title{font-size:22px;font-weight:850}.drawer-body{padding:18px}.section-title{margin:20px 0 10px;font-size:14px;color:#b9cbe0;text-transform:uppercase;letter-spacing:.08em}.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.detail{background:#101f33;border:1px solid #28415d;border-radius:13px;padding:12px}.detail span{display:block;color:#89a0b8;font-size:10px;text-transform:uppercase}.detail strong{display:block;margin-top:6px;font-size:13px}.member{display:grid;grid-template-columns:minmax(150px,1fr) auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #20334a}.member:last-child{border:0}.member-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.danger-zone{margin-top:22px;padding:15px;border:1px solid #713340;background:#261219;border-radius:15px}.danger-zone h3{margin:0 0 6px;color:#ff9cab;font-size:14px}.danger-zone p{font-size:12px;color:#c998a1;line-height:1.5}
 .modal-backdrop{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.62);display:grid;place-items:center;padding:18px;opacity:0;pointer-events:none;transition:.18s}.modal-backdrop.show{opacity:1;pointer-events:auto}.modal{width:min(520px,100%);background:#101d2f;border:1px solid #34506c;border-radius:20px;box-shadow:var(--shadow);padding:20px}.modal h3{margin:0 0 8px;font-size:20px}.modal p{margin:0 0 15px;color:var(--muted);font-size:13px;line-height:1.5}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.checkbox{display:flex;gap:9px;align-items:flex-start;color:#c4d3e2;font-size:13px;margin-top:12px}.checkbox input{margin-top:2px}
 .audio-dock{position:fixed;left:50%;bottom:18px;z-index:35;transform:translateX(-50%) translateY(130%);width:min(840px,calc(100% - 24px));background:linear-gradient(180deg,#14263d,#0c1929);border:1px solid #365779;border-radius:18px;padding:13px 15px;box-shadow:0 20px 60px rgba(0,0,0,.4);display:flex;align-items:center;gap:12px;transition:.25s}.audio-dock.show{transform:translateX(-50%) translateY(0)}.audio-icon{width:44px;height:44px;border-radius:14px;background:#153c32;border:1px solid #28765a;display:grid;place-items:center}.audio-main{min-width:0;flex:1}.audio-title{font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.audio-status{color:#9eb3c8;font-size:12px;margin-top:3px}.volume{width:120px}.pulse{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:6px;box-shadow:0 0 0 rgba(45,212,126,.55);animation:pulse 1.4s infinite}@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(45,212,126,.55)}70%{box-shadow:0 0 0 9px rgba(45,212,126,0)}100%{box-shadow:0 0 0 0 rgba(45,212,126,0)}}
+.monitor-all-control{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid #315070;background:#0c1929;border-radius:13px;color:#c5d6e8;font-size:13px;font-weight:750;user-select:none}.monitor-all-control input{position:absolute;opacity:0;pointer-events:none}.switch-track{position:relative;width:42px;height:23px;border-radius:999px;background:#49505a;border:1px solid #626b77;transition:.18s;flex:none}.switch-knob{position:absolute;top:3px;left:3px;width:15px;height:15px;border-radius:50%;background:#b2b8c0;transition:.18s;box-shadow:0 2px 7px rgba(0,0,0,.35)}.monitor-all-control input:checked+.switch-track{background:#267549;border-color:#36a568}.monitor-all-control input:checked+.switch-track .switch-knob{left:22px;background:#52e58c}.monitor-all-control:focus-within{box-shadow:0 0 0 3px rgba(74,163,255,.12);border-color:var(--blue)}.monitor-all-text{white-space:nowrap}.monitor-channel{color:#d7e8fb;font-weight:800}
 .toast{position:fixed;z-index:90;right:20px;bottom:20px;max-width:min(420px,calc(100% - 40px));background:#16283e;border:1px solid #365572;color:white;border-radius:13px;padding:12px 14px;box-shadow:var(--shadow);transform:translateY(25px);opacity:0;pointer-events:none;transition:.2s;font-size:13px}.toast.show{transform:none;opacity:1}.toast.error{border-color:#8c4050;background:#321820}.toast.ok{border-color:#2b7053;background:#103326}
 .loading{opacity:.55;pointer-events:none}.kbd{font-family:ui-monospace,monospace;background:#172b42;border:1px solid #36516d;border-radius:6px;padding:2px 5px;font-size:11px}
 @media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.stats .stat:last-child{grid-column:1/-1}.detail-grid{grid-template-columns:1fr 1fr}}
@@ -72,6 +73,11 @@ h1{font-size:28px;margin:18px 0 8px}.lead{margin:0;color:var(--muted);line-heigh
 
     <section class="toolbar">
       <input id="searchInput" class="input search" placeholder="Pesquisar por nome, UID, e-mail ou ID do canal">
+      <label class="monitor-all-control" title="Escuta automaticamente o primeiro canal que iniciar uma transmissão">
+        <input id="monitorAllToggle" type="checkbox">
+        <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
+        <span class="monitor-all-text">Monitorar todos os canais</span>
+      </label>
       <div class="tabs">
         <button class="tab active" data-tab="channels">Canais</button>
         <button class="tab" data-tab="users">Usuários</button>
@@ -127,7 +133,7 @@ var $=function(id){return document.getElementById(id)};
 var els={
   loginView:$('loginView'),appView:$('appView'),serverInput:$('serverInput'),tokenInput:$('tokenInput'),loginBtn:$('loginBtn'),loginError:$('loginError'),
   connDot:$('connDot'),connText:$('connText'),refreshBtn:$('refreshBtn'),logoutBtn:$('logoutBtn'),searchInput:$('searchInput'),channelsPanel:$('channelsPanel'),usersPanel:$('usersPanel'),channelsBody:$('channelsBody'),usersBody:$('usersBody'),channelCount:$('channelCount'),userCount:$('userCount'),
-  statUsers:$('statUsers'),statOnline:$('statOnline'),statBanned:$('statBanned'),statChannels:$('statChannels'),statTx:$('statTx'),drawerBackdrop:$('drawerBackdrop'),drawerTitle:$('drawerTitle'),drawerSub:$('drawerSub'),drawerBody:$('drawerBody'),drawerClose:$('drawerClose'),modalBackdrop:$('modalBackdrop'),modalTitle:$('modalTitle'),modalText:$('modalText'),modalFields:$('modalFields'),modalCancel:$('modalCancel'),modalOk:$('modalOk'),toast:$('toast'),main:$('main'),audioDock:$('audioDock'),audioTitle:$('audioTitle'),audioStatus:$('audioStatus'),volumeRange:$('volumeRange'),audioStop:$('audioStop')
+  statUsers:$('statUsers'),statOnline:$('statOnline'),statBanned:$('statBanned'),statChannels:$('statChannels'),statTx:$('statTx'),drawerBackdrop:$('drawerBackdrop'),drawerTitle:$('drawerTitle'),drawerSub:$('drawerSub'),drawerBody:$('drawerBody'),drawerClose:$('drawerClose'),modalBackdrop:$('modalBackdrop'),modalTitle:$('modalTitle'),modalText:$('modalText'),modalFields:$('modalFields'),modalCancel:$('modalCancel'),modalOk:$('modalOk'),toast:$('toast'),main:$('main'),audioDock:$('audioDock'),audioTitle:$('audioTitle'),audioStatus:$('audioStatus'),volumeRange:$('volumeRange'),audioStop:$('audioStop'),monitorAllToggle:$('monitorAllToggle')
 };
 
 function esc(v){return String(v==null?'':v).replace(/[&<>'"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]});}
@@ -162,7 +168,7 @@ async function login(){
   els.loginBtn.disabled=false;
 }
 
-function logout(){audio.stop();stopAutoRefresh();sessionStorage.removeItem('zlinkMasterToken');state.token='';state.overview=null;els.appView.classList.add('hidden');els.loginView.classList.remove('hidden');els.tokenInput.value='';}
+function logout(){audio.stop();els.monitorAllToggle.checked=false;stopAutoRefresh();sessionStorage.removeItem('zlinkMasterToken');state.token='';state.overview=null;els.appView.classList.add('hidden');els.loginView.classList.remove('hidden');els.tokenInput.value='';}
 
 async function refresh(silent){
   if(!state.token||state.loading)return;
@@ -247,7 +253,7 @@ async function deleteChannel(id){var c=getChannel(id);if(!c)return;var ok=await 
 async function runAction(path,body,success){setLoading(true);try{await api(path,'POST',body);toast(success,'ok');await refresh(true);}catch(e){toast(e.message,'error');}setLoading(false);}
 
 function clickAction(e){var b=e.target.closest('[data-action]');if(!b)return;var a=b.getAttribute('data-action'),id=b.getAttribute('data-id'),uid=b.getAttribute('data-user');
-  if(a==='open-channel')openChannel(id);else if(a==='listen')audio.start(id);else if(a==='rename-channel')actionRenameChannel(id);else if(a==='rename-user')actionRenameUser(id);else if(a==='ban-user')actionBanUser(id);else if(a==='unban-user')actionUnbanUser(id);else if(a==='mod-on')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:true},'Usuário promovido a Moderador.');else if(a==='mod-off')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:false},'Moderação removida.');else if(a==='channel-block')runMemberAction('/api/master/channels/block-user',uid,{},'Usuário bloqueado no canal.','O usuário será impedido de participar deste canal.');else if(a==='channel-unblock')runMemberAction('/api/master/channels/unblock-user',uid,{},'Usuário desbloqueado no canal.');else if(a==='remove-member')runMemberAction('/api/master/channels/remove-user',uid,{},'Usuário removido do canal.','O usuário será removido da lista deste canal.');else if(a==='transfer-owner')transferOwner();else if(a==='delete-channel')deleteChannel(id||state.selectedChannelId);
+  if(a==='open-channel')openChannel(id);else if(a==='listen'){els.monitorAllToggle.checked=false;audio.start(id);}else if(a==='rename-channel')actionRenameChannel(id);else if(a==='rename-user')actionRenameUser(id);else if(a==='ban-user')actionBanUser(id);else if(a==='unban-user')actionUnbanUser(id);else if(a==='mod-on')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:true},'Usuário promovido a Moderador.');else if(a==='mod-off')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:false},'Moderação removida.');else if(a==='channel-block')runMemberAction('/api/master/channels/block-user',uid,{},'Usuário bloqueado no canal.','O usuário será impedido de participar deste canal.');else if(a==='channel-unblock')runMemberAction('/api/master/channels/unblock-user',uid,{},'Usuário desbloqueado no canal.');else if(a==='remove-member')runMemberAction('/api/master/channels/remove-user',uid,{},'Usuário removido do canal.','O usuário será removido da lista deste canal.');else if(a==='transfer-owner')transferOwner();else if(a==='delete-channel')deleteChannel(id||state.selectedChannelId);
 }
 
 var audio={
@@ -259,6 +265,7 @@ var audio={
   channelName:'',
   speaker:'',
   pcmRemainder:null,
+  mode:'none',
 
   async ensureAudio(){
     if(!window.AudioContext&&!window.webkitAudioContext){
@@ -280,16 +287,58 @@ var audio={
     this.pcmRemainder=null;
   },
 
+  channelLabel(channelId,fallback){
+    var c=getChannel(channelId);
+    return String(
+      fallback||
+      (c&&c.name)||
+      channelId||
+      'Canal'
+    );
+  },
+
   async start(channelId){
     var c=getChannel(channelId);
     if(!c)return;
 
-    this.stop();
-    this.channelId=channelId;
-    this.channelName=c.name;
+    els.monitorAllToggle.checked=false;
 
-    els.audioTitle.textContent='Monitorando: '+c.name;
-    els.audioStatus.textContent='Preparando áudio AMR-WB...';
+    await this.connect(
+      'channel',
+      channelId,
+      c.name
+    );
+  },
+
+  async startAll(){
+    /*
+     * O modo global sempre começa desligado. Só entra aqui quando o usuário
+     * ativa explicitamente a chave no painel.
+     */
+    await this.connect(
+      'all',
+      null,
+      ''
+    );
+  },
+
+  async connect(mode,channelId,channelName){
+    this.stop(false);
+
+    this.mode=mode;
+    this.channelId=channelId;
+    this.channelName=channelName||'';
+    this.speaker='';
+
+    if(mode==='all'){
+      els.audioTitle.textContent='Monitorando todos os canais';
+      els.audioStatus.innerHTML=
+        '<span class="pulse"></span>Aguardando qualquer canal transmitir';
+    }else{
+      els.audioTitle.textContent='Monitorando: '+this.channelName;
+      els.audioStatus.textContent='Preparando áudio AMR-WB...';
+    }
+
     els.audioDock.classList.add('show');
 
     try{
@@ -297,6 +346,12 @@ var audio={
     }catch(e){
       els.audioStatus.textContent=e.message;
       toast(e.message,'error');
+
+      if(mode==='all'){
+        els.monitorAllToggle.checked=false;
+      }
+
+      this.mode='none';
       return;
     }
 
@@ -326,14 +381,49 @@ var audio={
         }
 
         if(m.type==='admin_monitor_ready'){
-          self.ws.send(JSON.stringify({
-            type:'admin_monitor_select',
-            channelId:channelId
-          }));
+          if(self.mode==='all'){
+            self.ws.send(JSON.stringify({
+              type:'admin_monitor_all_start'
+            }));
+          }else if(self.mode==='channel'&&self.channelId){
+            self.ws.send(JSON.stringify({
+              type:'admin_monitor_select',
+              channelId:self.channelId
+            }));
+          }
         }else if(m.type==='admin_monitor_selected'){
           els.audioStatus.innerHTML=
             '<span class="pulse"></span>Aguardando transmissão';
+        }else if(m.type==='admin_monitor_all_started'){
+          els.audioTitle.textContent='Monitorando todos os canais';
+          els.audioStatus.innerHTML=
+            '<span class="pulse"></span>Aguardando qualquer canal transmitir';
+        }else if(m.type==='admin_monitor_all_waiting'){
+          self.channelId=null;
+          self.channelName='';
+          self.speaker='';
+          self.pcmRemainder=null;
+
+          els.audioStatus.innerHTML=
+            '<span class="pulse"></span>Aguardando qualquer canal transmitir';
+        }else if(m.type==='admin_monitor_all_channel'){
+          self.channelId=m.channelId||null;
+          self.channelName=self.channelLabel(
+            m.channelId,
+            m.channelName
+          );
+          self.speaker=m.name||m.userId||'Usuário';
+
+          els.audioStatus.innerHTML=
+            '<span class="pulse"></span>Canal detectado: <span class="monitor-channel">'+
+            esc(self.channelName)+
+            '</span> · '+esc(self.speaker);
         }else if(m.type==='admin_monitor_tx_start'){
+          self.channelId=m.channelId||self.channelId;
+          self.channelName=self.channelLabel(
+            m.channelId,
+            m.channelName||self.channelName
+          );
           self.speaker=m.name||m.userId||'Usuário';
 
           if(self.ctx){
@@ -342,10 +432,6 @@ var audio={
               self.nextTime
             );
 
-            /*
-             * Se ficou uma fila antiga grande (aba suspensa, troca de janela),
-             * não reproduz áudio atrasado por vários segundos.
-             */
             if(self.nextTime>self.ctx.currentTime+0.75){
               self.nextTime=self.ctx.currentTime+0.08;
             }
@@ -353,13 +439,27 @@ var audio={
 
           self.pcmRemainder=null;
 
-          els.audioStatus.innerHTML=
-            '<span class="pulse"></span>Ouvindo '+esc(self.speaker);
+          if(self.mode==='all'){
+            els.audioTitle.textContent='Monitorando todos os canais';
+            els.audioStatus.innerHTML=
+              '<span class="pulse"></span>Ouvindo <span class="monitor-channel">'+
+              esc(self.channelName)+
+              '</span> · '+esc(self.speaker);
+          }else{
+            els.audioStatus.innerHTML=
+              '<span class="pulse"></span>Ouvindo '+esc(self.speaker);
+          }
         }else if(m.type==='admin_monitor_tx_stop'){
-          els.audioStatus.innerHTML=
-            '<span class="pulse"></span>Aguardando transmissão';
           self.speaker='';
           self.pcmRemainder=null;
+
+          if(self.mode==='all'){
+            els.audioStatus.innerHTML=
+              '<span class="pulse"></span>Procurando outro canal em transmissão...';
+          }else{
+            els.audioStatus.innerHTML=
+              '<span class="pulse"></span>Aguardando transmissão';
+          }
         }else if(m.type==='admin_monitor_audio_error'){
           els.audioStatus.textContent=
             m.message||'Falha ao decodificar AMR-WB no servidor';
@@ -377,6 +477,10 @@ var audio={
             m.message||'Falha no monitor de áudio',
             'error'
           );
+
+          if(self.mode==='all'){
+            els.monitorAllToggle.checked=false;
+          }
         }
 
         return;
@@ -387,10 +491,14 @@ var audio={
 
     this.ws.onerror=function(){
       els.audioStatus.textContent='Falha na conexão de áudio';
+
+      if(self.mode==='all'){
+        els.monitorAllToggle.checked=false;
+      }
     };
 
     this.ws.onclose=function(){
-      if(self.channelId){
+      if(self.mode!=='none'){
         els.audioStatus.textContent='Monitor de áudio desconectado';
       }
     };
@@ -401,10 +509,6 @@ var audio={
 
     var u8=new Uint8Array(buffer);
 
-    /*
-     * Cabeçalho ZLPCM v1 enviado pelo server.js:
-     * 5A 4C 50 43 4D 01
-     */
     if(
       u8.length<=6||
       u8[0]!==0x5A||
@@ -419,11 +523,6 @@ var audio={
 
     var payload=u8.slice(6);
 
-    /*
-     * PCM S16LE precisa sempre de pares de bytes. Guarda um eventual byte
-     * incompleto entre mensagens, embora o FFmpeg normalmente entregue
-     * blocos alinhados.
-     */
     if(this.pcmRemainder&&this.pcmRemainder.length){
       var joined=new Uint8Array(
         this.pcmRemainder.length+payload.length
@@ -482,7 +581,11 @@ var audio={
     this.nextTime+=audioBuffer.duration;
   },
 
-  stop(){
+  stop(resetToggle){
+    if(resetToggle!==false){
+      els.monitorAllToggle.checked=false;
+    }
+
     if(this.ws){
       try{
         if(this.ws.readyState===1){
@@ -497,7 +600,9 @@ var audio={
       this.ws=null;
     }
 
+    this.mode='none';
     this.channelId=null;
+    this.channelName='';
     this.speaker='';
     this.pcmRemainder=null;
 
@@ -518,6 +623,7 @@ var audio={
 els.loginBtn.addEventListener('click',login);els.tokenInput.addEventListener('keydown',function(e){if(e.key==='Enter')login();});els.refreshBtn.addEventListener('click',function(){refresh(false);});els.logoutBtn.addEventListener('click',logout);els.searchInput.addEventListener('input',function(){state.search=this.value.trim();renderChannels();renderUsers();});
 document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});t.classList.add('active');state.tab=t.getAttribute('data-tab');els.channelsPanel.classList.toggle('hidden',state.tab!=='channels');els.usersPanel.classList.toggle('hidden',state.tab!=='users');});});
 els.channelsBody.addEventListener('click',clickAction);els.usersBody.addEventListener('click',clickAction);els.drawerBody.addEventListener('click',clickAction);els.drawerClose.addEventListener('click',closeDrawer);els.drawerBackdrop.addEventListener('click',function(e){if(e.target===els.drawerBackdrop)closeDrawer();});els.modalCancel.addEventListener('click',function(){modalDone(false);});els.modalOk.addEventListener('click',function(){modalDone(true);});els.modalBackdrop.addEventListener('click',function(e){if(e.target===els.modalBackdrop)modalDone(false);});els.audioStop.addEventListener('click',function(){audio.stop();});els.volumeRange.addEventListener('input',function(){audio.setVolume(this.value);});
+els.monitorAllToggle.addEventListener('change',function(){if(this.checked){audio.startAll();}else if(audio.mode==='all'){audio.stop(false);}});
 window.addEventListener('keydown',function(e){if(e.key==='Escape'){if(els.modalBackdrop.classList.contains('show'))modalDone(false);else if(els.drawerBackdrop.classList.contains('show'))closeDrawer();}});
 window.addEventListener('beforeunload',function(){audio.stop();});
 
