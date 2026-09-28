@@ -221,6 +221,69 @@ a{color:inherit}
 }
 .login-error{margin-top:12px;color:#ff95a4;font-size:13px;min-height:18px}
 
+/* Login feedback / transition */
+#loginView .login-shell{
+  transform:translateY(0) scale(1);
+  opacity:1;
+  transition:transform .30s cubic-bezier(.2,.8,.2,1),opacity .25s ease,filter .25s ease;
+}
+#loginView.authenticating .login-shell{
+  animation:loginBreath .85s ease-in-out infinite alternate;
+}
+#loginView.authenticating .login-card{
+  position:relative;
+}
+#loginView.authenticating .login-card:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(90,169,255,.16),0 0 38px rgba(47,127,230,.08);
+}
+#loginView.login-success .login-shell{
+  transform:translateY(-10px) scale(.985);
+  opacity:0;
+  filter:blur(3px);
+}
+#loginView.login-failed .login-card{
+  animation:loginShake .38s ease;
+}
+#loginBtn.is-loading{
+  position:relative;
+  cursor:wait;
+}
+#loginBtn.is-loading:before{
+  content:"";
+  width:16px;
+  height:16px;
+  flex:none;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);
+  border-top-color:#fff;
+  animation:loginSpin .7s linear infinite;
+}
+@keyframes loginSpin{to{transform:rotate(360deg)}}
+@keyframes loginBreath{
+  from{box-shadow:0 35px 100px rgba(0,0,0,.42)}
+  to{box-shadow:0 35px 110px rgba(0,0,0,.46),0 0 0 1px rgba(90,169,255,.07),0 0 42px rgba(47,127,230,.08)}
+}
+@keyframes loginShake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-6px)}
+  50%{transform:translateX(5px)}
+  75%{transform:translateX(-3px)}
+}
+@media(prefers-reduced-motion:reduce){
+  #loginView .login-shell,
+  #loginView.authenticating .login-shell,
+  #loginView.login-failed .login-card,
+  #loginBtn.is-loading:before{
+    animation:none!important;
+    transition:none!important;
+  }
+}
+
 /* Buttons */
 .btn{
   border:1px solid transparent;
@@ -857,21 +920,59 @@ async function api(path,method,body){
 
 async function login(){
   var server=normalizeServer(els.serverInput.value),token=els.tokenInput.value.trim();
-  if(!server||!token){els.loginError.textContent='Informe o servidor e o token mestre.';return;}
-  els.loginBtn.disabled=true;els.loginError.textContent='';
+  if(!server||!token){
+    els.loginError.textContent='Informe o servidor e o token mestre.';
+    els.loginView.classList.remove('login-failed');
+    void els.loginView.offsetWidth;
+    els.loginView.classList.add('login-failed');
+    setTimeout(function(){els.loginView.classList.remove('login-failed');},420);
+    return;
+  }
+
+  var originalLabel='Entrar na Central de Controle';
+  els.loginBtn.disabled=true;
+  els.loginBtn.classList.add('is-loading');
+  els.loginBtn.textContent='Conectando...';
+  els.loginError.textContent='';
+  els.loginView.classList.remove('login-failed','login-success');
+  els.loginView.classList.add('authenticating');
+
   state.server=server;state.token=token;
+
   try{
     var data=await api('/api/master/overview');
     state.overview=data;
     sessionStorage.setItem('zlinkMasterServer',server);
     sessionStorage.setItem('zlinkMasterToken',token);
-    els.loginView.classList.add('hidden');els.appView.classList.remove('hidden');
-    setConnection(true,'Conectado');render();startAutoRefresh();
-  }catch(e){state.token='';setConnection(false,'Falha');els.loginError.textContent=e.message;}
+
+    els.loginView.classList.remove('authenticating');
+    els.loginView.classList.add('login-success');
+    els.loginBtn.textContent='Acesso autorizado';
+
+    await new Promise(function(resolve){setTimeout(resolve,280);});
+
+    els.loginView.classList.add('hidden');
+    els.loginView.classList.remove('login-success');
+    els.appView.classList.remove('hidden');
+
+    setConnection(true,'Conectado');
+    render();
+    startAutoRefresh();
+  }catch(e){
+    state.token='';
+    setConnection(false,'Falha');
+    els.loginError.textContent=e.message;
+    els.loginView.classList.remove('authenticating','login-success');
+    els.loginView.classList.add('login-failed');
+    setTimeout(function(){els.loginView.classList.remove('login-failed');},420);
+  }
+
+  els.loginBtn.classList.remove('is-loading');
+  els.loginBtn.textContent=originalLabel;
   els.loginBtn.disabled=false;
 }
 
-function logout(){audio.stop();els.monitorAllToggle.checked=false;stopAutoRefresh();sessionStorage.removeItem('zlinkMasterToken');state.token='';state.overview=null;els.appView.classList.add('hidden');els.loginView.classList.remove('hidden');els.tokenInput.value='';}
+function logout(){audio.stop();els.monitorAllToggle.checked=false;stopAutoRefresh();sessionStorage.removeItem('zlinkMasterToken');state.token='';state.overview=null;els.appView.classList.add('hidden');els.loginView.classList.remove('hidden','authenticating','login-success','login-failed');els.loginBtn.classList.remove('is-loading');els.loginBtn.textContent='Entrar na Central de Controle';els.loginBtn.disabled=false;els.tokenInput.value='';}
 
 async function refresh(silent){
   if(!state.token||state.loading)return;
