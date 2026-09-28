@@ -909,9 +909,9 @@ function renderChannels(){
 }
 function renderUsers(){
   var rows=(state.overview.users||[])
-    .filter(function(u){return !!u.online;})
     .filter(function(u){return matchSearch([u.name,u.uid,u.email,u.activeChannelId]);})
     .sort(function(a,b){
+      if(!!a.online!==!!b.online)return a.online?-1:1;
       return String(a.name||'').localeCompare(String(b.name||''),'pt-BR',{sensitivity:'base'});
     });
   els.userCount.textContent=rows.length+' exibidos';
