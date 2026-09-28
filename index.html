@@ -908,7 +908,12 @@ function renderChannels(){
   }).join('');
 }
 function renderUsers(){
-  var rows=(state.overview.users||[]).filter(function(u){return matchSearch([u.name,u.uid,u.email,u.activeChannelId]);});
+  var rows=(state.overview.users||[])
+    .filter(function(u){return !!u.online;})
+    .filter(function(u){return matchSearch([u.name,u.uid,u.email,u.activeChannelId]);})
+    .sort(function(a,b){
+      return String(a.name||'').localeCompare(String(b.name||''),'pt-BR',{sensitivity:'base'});
+    });
   els.userCount.textContent=rows.length+' exibidos';
   if(!rows.length){els.usersBody.innerHTML='<tr><td colspan="6" class="empty">Nenhum usuário encontrado.</td></tr>';return;}
   els.usersBody.innerHTML=rows.map(function(u){
