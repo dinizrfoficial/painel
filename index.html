@@ -893,7 +893,13 @@ function render(){
 
 function matchSearch(values){var q=state.search.toLowerCase();if(!q)return true;return values.some(function(v){return String(v||'').toLowerCase().indexOf(q)>=0;});}
 function renderChannels(){
-  var rows=(state.overview.channels||[]).filter(function(c){return matchSearch([c.name,c.id,c.ownerName,c.ownerUid,c.type]);});
+  var rows=(state.overview.channels||[])
+    .filter(function(c){return matchSearch([c.name,c.id,c.ownerName,c.ownerUid,c.type]);})
+    .sort(function(a,b){
+      var byMembers=(Number(b.memberCount)||0)-(Number(a.memberCount)||0);
+      if(byMembers!==0)return byMembers;
+      return String(a.name||'').localeCompare(String(b.name||''),'pt-BR',{sensitivity:'base'});
+    });
   els.channelCount.textContent=rows.length+' exibidos';
   if(!rows.length){els.channelsBody.innerHTML='<tr><td colspan="6" class="empty">Nenhum canal encontrado.</td></tr>';return;}
   els.channelsBody.innerHTML=rows.map(function(c){
