@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Referrer-Policy" content="no-referrer">
+<title>Renovar acesso • Z-Link Talk</title>
+<style>
+:root{color-scheme:dark;--ink:#eaf4ff;--muted:#aec4df;--blue:#288dff;--stroke:#29425f}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 78% 12%,#16437e 0,transparent 35%),radial-gradient(circle at 9% 69%,#102c50 0,transparent 36%),#080f1c;color:var(--ink);font:16px/1.55 system-ui,-apple-system,'Segoe UI',sans-serif}
+header{max-width:850px;margin:0 auto;padding:36px 22px 24px;display:flex;gap:17px;align-items:center}header .mark{display:grid;place-items:center;width:56px;height:56px;border-radius:17px;background:linear-gradient(135deg,#49c8ff,#1368f6);font-size:29px;font-weight:950;box-shadow:0 7px 35px #246cf654}h1{font-size:28px;line-height:1.18;margin:0}small{color:var(--muted)}main{max-width:850px;margin:0 auto;padding:8px 22px 76px}.panel{border:1px solid var(--stroke);background:linear-gradient(145deg,#152840eF,#101a2df0);border-radius:24px;box-shadow:0 25px 70px #0007;padding:28px;margin-bottom:20px}.eyebrow{letter-spacing:.13em;text-transform:uppercase;color:#80c8ff;font-size:12px;font-weight:800}.subtitle{margin:8px 0 26px;color:var(--muted)}.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.summary>div{background:#0e2139;border:1px solid #26415d;padding:17px;border-radius:15px}.summary b{font-size:18px;display:block;margin-top:5px;overflow-wrap:anywhere}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}.plan{border:1px solid #2b4869;background:#102039;border-radius:16px;padding:18px;text-align:left;cursor:pointer;color:inherit;transition:transform .16s,border-color .16s,background .16s;width:100%}.plan:hover{transform:translateY(-3px);border-color:#63aaff}.plan[aria-pressed="true"]{border:2px solid #61c5ff;background:#193a63}.plan b{display:block;font-size:18px}.plan .amount{font-size:25px;color:#8ad9ff;font-weight:800;margin-top:6px}.plan small{display:block}.primary{border:0;border-radius:14px;background:linear-gradient(120deg,#35b5fd,#2669f9);color:white;font-size:16px;font-weight:780;padding:16px 22px;width:100%;margin-top:22px;cursor:pointer;box-shadow:0 9px 27px #157cfb40}.primary:disabled{opacity:.45;cursor:not-allowed}.message{margin-top:14px;color:#f1c68b}.note{color:var(--muted);font-size:13px;margin-top:15px}.hide{display:none}.status{color:#abd9ff}@media(max-width:580px){header{padding-top:25px}.panel{padding:20px}.summary,.grid{grid-template-columns:1fr}h1{font-size:23px}}
+</style>
+</head>
+<body>
+<header><div class="mark" aria-hidden="true">Z</div><div><h1>Z-Link Talk</h1><small>Renovação e contribuição com pagamento seguro</small></div></header>
+<main>
+<section class="panel" aria-labelledby="headline">
+<div class="eyebrow">Acesso à plataforma</div><h2 id="headline">Renovar seu acesso</h2>
+<p class="subtitle" id="hint">Verificando seu link temporário de renovação...</p>
+<div class="summary hide" id="summary"><div><small>Conta</small><b id="who">—</b></div><div><small>Situação</small><b id="access">—</b></div><div><small>Vencimento</small><b id="expires">—</b></div></div>
+</section>
+<section class="panel hide" id="paymentSection" aria-labelledby="plansTitle">
+<div class="eyebrow">Checkout Pro • Mercado Pago</div><h2 id="plansTitle">Escolha o período</h2>
+<p class="subtitle">Os valores abaixo vêm diretamente do servidor Z-Link Talk. Não há renovação automática.</p>
+<div class="grid" id="plans" role="group" aria-label="Períodos disponíveis"></div>
+<button class="primary" id="checkout" disabled>Realizar contribuição</button>
+<p class="note">Ao confirmar, você será encaminhado ao Mercado Pago. O acesso é liberado pelo servidor quando o pagamento for aprovado — não é necessário tocar no equipamento. Se renovar antes de vencer, os dias restantes serão preservados.</p>
+</section>
+<section class="panel"><div class="status" id="message" role="status" aria-live="polite">Aguardando verificação...</div><p class="note">Links de renovação têm prazo de validade e não permitem entrar na conta. Caso o link tenha expirado, solicite outro à administração Z-Link Talk. Nunca compartilhe seus códigos ou credenciais.</p></section>
+</main>
+<script>
+'use strict';
+(function(){
+  const API='https://servidor.zlinktalk.com.br';
+  const qs=new URLSearchParams(location.search);
+  const token=qs.get('token')||'';
+  // Remove o token da barra de endereço e do histórico antes de qualquer requisição.
+  history.replaceState(null,'',location.pathname);
+  const $=id=>document.getElementById(id);
+  const message=$('message'),btn=$('checkout');
+  let chosen='',busy=false,usableToken=token;
+  const money=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+  function date(v){return Number(v)>0?new Date(Number(v)).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}):'Sem data';}
+  function setMessage(text){message.textContent=text;}
+  async function json(path,body){
+    const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),18000);
+    try {
+      const response=await fetch(API+path,{
+        method:'POST',headers:{'Content-Type':'application/json; charset=utf-8','Accept':'application/json'},
+        body:JSON.stringify(body),signal:ctrl.signal,referrerPolicy:'no-referrer',cache:'no-store'
+      });
+      const data=await response.json();
+      if(!response.ok||!data.success)throw new Error(data.error||'Serviço temporariamente indisponível.');
+      return data;
+    } finally{clearTimeout(timer);}
+  }
+  async function load(){
+    if(!/^[A-Za-z0-9_-]{40,90}$/.test(usableToken)){setMessage('Link inválido. Solicite uma nova mensagem de renovação.');$('hint').textContent='Não foi possível validar seu link.';return;}
+    try{
+      const data=await json('/api/renewal/info',{token:usableToken});
+      $('who').textContent=data.name||'Titular';
+      $('access').textContent=data.accessActive?(data.accessType==='trial'?'Degustação ativa':'Acesso ativo'):'Contribuição necessária';
+      $('expires').textContent=date(data.nextExpiration);
+      $('summary').classList.remove('hide');
+      $('hint').textContent='Escolha o período que deseja acrescentar ao acesso desta conta.';
+      if(!data.mercadoPagoConfigured){setMessage('Pagamento indisponível no momento. Entre em contato com o suporte.');return;}
+      const list=Array.isArray(data.plans)?data.plans:[];
+      const plans=$('plans');plans.replaceChildren();
+      list.filter(p=>p.enabled!==false).forEach(p=>{
+        const option=document.createElement('button');option.type='button';option.className='plan';option.setAttribute('aria-pressed','false');
+        const title=document.createElement('b');title.textContent=p.label||'Período';
+        const amount=document.createElement('span');amount.className='amount';amount.textContent=money.format(Number(p.amount)||0);
+        const detail=document.createElement('small');detail.textContent='Pagamento único • sem renovação automática';
+        option.append(title,amount,detail);
+        option.addEventListener('click',()=>{
+          chosen=p.id;Array.from(plans.children).forEach(x=>x.setAttribute('aria-pressed',x===option?'true':'false'));
+          btn.disabled=false;
+        });plans.append(option);
+      });
+      $('paymentSection').classList.remove('hide');
+      setMessage(list.length?'Pagamento processado com segurança pelo Mercado Pago.':'Não existem planos disponíveis.');
+    }catch(error){setMessage(error.message||'Não foi possível consultar a renovação.');$('hint').textContent='Link inválido ou expirado.';}
+  }
+  btn.addEventListener('click',async()=>{
+    if(busy||!chosen)return;
+    busy=true;btn.disabled=true;btn.textContent='Abrindo checkout...';
+    try{
+      const response=await json('/api/renewal/checkout',{token:usableToken,planId:chosen});
+      const url=new URL(response.checkoutUrl);
+      if(url.protocol!=='https:'||!(/(^|\.)mercadopago\.com(\.br)?$|(^|\.)mercadopago\.com$/.test(url.hostname)))
+        throw new Error('Endereço de pagamento inválido.');
+      usableToken='';
+      location.assign(url.href);
+    }catch(error){setMessage(error.message||'Falha ao abrir o pagamento.');btn.textContent='Tentar novamente';btn.disabled=false;busy=false;}
+  });
+  load();
+})();
+</script>
+</body>
+</html>
