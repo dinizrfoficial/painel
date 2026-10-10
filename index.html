@@ -1059,7 +1059,7 @@ function renderUsers(){
       acc=badge(u.accountStatus==='pending_payment'?'Aguardando pagamento':(u.emailVerified?'E-mail confirmado':'Aguardando e-mail'),'orange');
       if(u.pendingRegistration.expiresAt){acc+='<div class="sub">Reserva até '+esc(fmtDate(u.pendingRegistration.expiresAt))+'</div>';}
     }else{
-      acc=u.banned?badge('Bloqueada','red'):badge('Ativa','green');
+      acc=u.banned?badge('Bloqueada','red'):(u.accessExpired?badge('Acesso bloqueado','red'):badge('Ativa','green'));
       var trialStart=Number(u.trialStartedAt||0),trialEnd=Number(u.trialEndsAt||0);
       var trialActive=!!u.trialActive;
       var accessUntil=Number(u.accessExpiresAt||0);
@@ -1072,6 +1072,7 @@ function renderUsers(){
       }
       if(u.nextExpiration){acc+='<div class="sub">Próxima expiração: '+esc(fmtDate(u.nextExpiration))+'</div>';}
       if(u.lastPaymentAt){acc+='<div class="sub">Última contribuição: '+esc(fmtDate(u.lastPaymentAt))+' · '+esc(u.lastPaymentPlan||'')+' · '+esc(new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(u.lastPaymentAmount||0)))+'</div>';}
+      if(u.adminLastGrant){var g=u.adminLastGrant;acc+='<div class="sub">Liberação administrativa: '+(Number(g.days)===0?'sem vencimento':Number(g.days)+' dia(s)')+' · '+esc(fmtDate(g.grantedAt))+'</div>';}
       var notices=u.emailNotices||{},sendDays=[5,1];
       sendDays.forEach(function(d){
         var key='d'+d+'_'+Number(u.nextExpiration||0);
@@ -1080,10 +1081,10 @@ function renderUsers(){
       });
       var accessExpired=accessUntil>0&&accessUntil<=Date.now();
       if(u.contributionRequired || u.accessExpired){
-        acc+=' '+badge(u.accessExpired?'Contribuição necessária':'Contribuição ativa',u.accessExpired?'red':'purple');
+        acc+=' '+badge(u.accessExpired?'Contribuição necessária':(u.trialActive?'Contribuição após degustação':'Contribuição ativa'),u.accessExpired?'red':'purple');
         if(accessUntil>0&&!accessExpired){acc+='<div class="sub">Contribuição válida até '+esc(fmtDate(accessUntil))+'</div>';}
       }else if(u.accessType==='paid'){
-        acc+=' '+badge(accessExpired?'Acesso vencido':'Acesso pago',accessExpired?'red':'purple');
+        acc+=' '+badge(accessExpired?'Acesso vencido':(u.adminLastGrant&&Number(u.adminLastGrant.grantedAt||0)>Number(u.lastPaymentAt||0)?'Acesso autorizado':'Acesso pago'),accessExpired?'red':'purple');
         if(accessUntil>0){acc+='<div class="sub">Acesso até '+esc(fmtDate(accessUntil))+'</div>';}
       }else if(u.accessType==='free'){
         acc+=' '+badge('Gratuito','');
@@ -1112,9 +1113,11 @@ function renderUsers(){
       trialActions+='<button class="btn btn-ghost btn-sm" data-action="renewal-link" data-id="'+esc(u.uid)+'">Link de renovação</button>';
       trialActions+='<button class="btn btn-ghost btn-sm" data-action="renewal-revoke" data-id="'+esc(u.uid)+'">Revogar link</button>';
     }
+    var adminGrantAction=(!u.banned&&(!pending || (u.accountStatus==='pending_payment'&&u.emailVerified)))
+      ? '<button class="btn btn-green btn-sm" data-action="admin-grant" data-id="'+esc(u.uid)+'">Liberar acesso</button>' : '';
     var actions=pending
-      ? verifyAction+'<button class="btn btn-danger btn-sm" data-action="delete-user" data-id="'+esc(u.uid)+'">Cancelar cadastro</button>'
-      : verifyAction+contributionAction+trialActions+'<button class="btn btn-ghost btn-sm" data-action="update-user" data-id="'+esc(u.uid)+'">Atualizar</button>'+(u.banned?'<button class="btn btn-green btn-sm" data-action="unban-user" data-id="'+esc(u.uid)+'">Desbloquear</button>':'<button class="btn btn-warn btn-sm" data-action="ban-user" data-id="'+esc(u.uid)+'">Banir conta</button>')+'<button class="btn btn-danger btn-sm" data-action="delete-user" data-id="'+esc(u.uid)+'">Excluir</button>';
+      ? verifyAction+adminGrantAction+'<button class="btn btn-danger btn-sm" data-action="delete-user" data-id="'+esc(u.uid)+'">Cancelar cadastro</button>'
+      : verifyAction+contributionAction+trialActions+adminGrantAction+'<button class="btn btn-ghost btn-sm" data-action="update-user" data-id="'+esc(u.uid)+'">Atualizar</button>'+(u.banned?'<button class="btn btn-green btn-sm" data-action="unban-user" data-id="'+esc(u.uid)+'">Desbloquear</button>':'<button class="btn btn-warn btn-sm" data-action="ban-user" data-id="'+esc(u.uid)+'">Banir conta</button>')+'<button class="btn btn-danger btn-sm" data-action="delete-user" data-id="'+esc(u.uid)+'">Excluir</button>';
     return '<tr><td><div class="name">'+esc(u.name)+'</div><div class="mono">'+esc(u.uid)+'</div></td><td>'+esc(u.email||'—')+'</td><td>'+conn+'</td><td>'+u.channelCount+'</td><td>'+acc+'</td><td><div class="actions">'+actions+'</div></td></tr>';
   }).join('');
  }
@@ -1383,7 +1386,7 @@ async function actionTrial(uid,action){
   var isEnd=action==='end';
   var options={
     title:isEnd?'Encerrar degustação':(action==='extend'?'Prorrogar degustação':'Definir degustação'),
-    text:isEnd?'A degustação será encerrada agora. Sem período pago ativo, o PTT será bloqueado automaticamente.':'Conta: '+u.name+'. A validade paga já existente será preservada.',
+    text:isEnd?'A degustação será encerrada agora. Sem período pago ativo, o PTT será bloqueado automaticamente.':'Conta: '+u.name+'. A validade paga existente será preservada. Em contas gratuitas/legadas, ao fim da degustação será exigida contribuição.',
     html:isEnd?'':'<div class="field"><label>Quantidade de dias</label><input id="trialDays" class="input" type="number" min="1" max="3650" step="1" value="30"></div>',
     okText:isEnd?'Encerrar agora':'Confirmar',danger:isEnd
   };
@@ -1394,6 +1397,35 @@ async function actionTrial(uid,action){
   }
   await runAction('/api/master/users/trial',{userId:uid,action:action,days:days},
     isEnd?'Degustação encerrada.':'Degustação atualizada.');
+}
+async function actionAdminGrant(uid){
+  var u=getUser(uid);if(!u)return;
+  if(u.banned){toast('Desbloqueie a conta antes de liberar o acesso.','error');return;}
+  if(u.pendingRegistration&&!u.emailVerified){toast('A confirmação de e-mail é obrigatória antes da liberação.','error');return;}
+  var pending=!!u.pendingRegistration;
+  var ok=await modal({
+    title:'Liberar acesso manualmente',
+    text:'Conta: '+u.name+'. '+(pending
+      ? 'O cadastro com pagamento pendente será ativado sem marcar o Mercado Pago como pago.'
+      : 'O acesso será autorizado administrativamente e o aparelho remoto poderá recuperar a conexão automaticamente.'),
+    html:'<div class="field"><label>Período</label><select id="grantDays" class="input">'+
+      '<option value="30">30 dias</option><option value="90">90 dias</option><option value="180">180 dias</option><option value="365">1 ano</option><option value="0">Gratuito permanente</option></select></div>'+
+      '<div class="field"><label>Motivo</label><select id="grantReason" class="input">'+
+      '<option value="courtesy">Cortesia administrativa</option><option value="external_payment">Pagamento recebido por outro meio</option><option value="other">Outra autorização</option></select></div>'+
+      '<div class="field"><label>Observação (opcional, sem dados sensíveis)</label><textarea id="grantNote" class="input" maxlength="250" rows="2" placeholder="Ex.: cortesia aprovada"></textarea></div>'+
+      '<div class="hint">Esta operação não confirma nenhuma cobrança do Mercado Pago. Ela fica registrada no histórico administrativo.</div>',
+    okText: 'Confirmar liberação'
+  });
+  if(!ok)return;
+  var days=Number($('grantDays').value),reason=$('grantReason').value,note=$('grantNote').value.trim();
+  if(!Number.isInteger(days)||days<0||days>3650){toast('Período inválido.','error');return;}
+  setLoading(true);
+  try{
+    await api('/api/master/users/grant-access','POST',{userId:uid,days:days,reason:reason,note:note});
+    toast('Conta liberada administrativamente.','ok');
+    await refresh(true);
+  }catch(e){toast(e.message,'error');}
+  setLoading(false);
 }
 async function actionRevokeRenewalLink(uid){
   var u=getUser(uid);if(!u)return;
@@ -1429,7 +1461,7 @@ async function deleteChannel(id){var c=getChannel(id);if(!c)return;var ok=await 
 async function runAction(path,body,success){setLoading(true);try{await api(path,'POST',body);toast(success,'ok');await refresh(true);}catch(e){toast(e.message,'error');}setLoading(false);}
 
 function clickAction(e){var b=e.target.closest('[data-action]');if(!b)return;var a=b.getAttribute('data-action'),id=b.getAttribute('data-id'),uid=b.getAttribute('data-user');
-  if(a==='open-channel')openChannel(id);else if(a==='listen'){els.monitorAllToggle.checked=false;audio.start(id);}else if(a==='rename-channel')actionRenameChannel(id);else if(a==='resend-verification')actionResendVerification(id);else if(a==='contribution-on')actionContributionRequirement(id,true);else if(a==='contribution-off')actionContributionRequirement(id,false);else if(a==='trial-define')actionTrial(id,'define');else if(a==='trial-extend')actionTrial(id,'extend');else if(a==='trial-end')actionTrial(id,'end');else if(a==='renewal-link')actionRenewalLink(id);else if(a==='renewal-revoke')actionRevokeRenewalLink(id);else if(a==='update-user')actionUpdateUser(id);else if(a==='delete-user')actionDeleteUser(id);else if(a==='rename-user')actionRenameUser(id);else if(a==='ban-user')actionBanUser(id);else if(a==='unban-user')actionUnbanUser(id);else if(a==='mod-on')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:true},'Usuário promovido a Moderador.');else if(a==='mod-off')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:false},'Moderação removida.');else if(a==='channel-block')runMemberAction('/api/master/channels/block-user',uid,{},'Usuário bloqueado no canal.','O usuário será impedido de participar deste canal.');else if(a==='channel-unblock')runMemberAction('/api/master/channels/unblock-user',uid,{},'Usuário desbloqueado no canal.');else if(a==='remove-member')runMemberAction('/api/master/channels/remove-user',uid,{},'Usuário removido do canal.','O usuário será removido da lista deste canal.');else if(a==='transfer-owner')transferOwner();else if(a==='delete-channel')deleteChannel(id||state.selectedChannelId);
+  if(a==='open-channel')openChannel(id);else if(a==='listen'){els.monitorAllToggle.checked=false;audio.start(id);}else if(a==='rename-channel')actionRenameChannel(id);else if(a==='resend-verification')actionResendVerification(id);else if(a==='contribution-on')actionContributionRequirement(id,true);else if(a==='contribution-off')actionContributionRequirement(id,false);else if(a==='trial-define')actionTrial(id,'define');else if(a==='trial-extend')actionTrial(id,'extend');else if(a==='trial-end')actionTrial(id,'end');else if(a==='admin-grant')actionAdminGrant(id);else if(a==='renewal-link')actionRenewalLink(id);else if(a==='renewal-revoke')actionRevokeRenewalLink(id);else if(a==='update-user')actionUpdateUser(id);else if(a==='delete-user')actionDeleteUser(id);else if(a==='rename-user')actionRenameUser(id);else if(a==='ban-user')actionBanUser(id);else if(a==='unban-user')actionUnbanUser(id);else if(a==='mod-on')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:true},'Usuário promovido a Moderador.');else if(a==='mod-off')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:false},'Moderação removida.');else if(a==='channel-block')runMemberAction('/api/master/channels/block-user',uid,{},'Usuário bloqueado no canal.','O usuário será impedido de participar deste canal.');else if(a==='channel-unblock')runMemberAction('/api/master/channels/unblock-user',uid,{},'Usuário desbloqueado no canal.');else if(a==='remove-member')runMemberAction('/api/master/channels/remove-user',uid,{},'Usuário removido do canal.','O usuário será removido da lista deste canal.');else if(a==='transfer-owner')transferOwner();else if(a==='delete-channel')deleteChannel(id||state.selectedChannelId);
 }
 
 var audio={
