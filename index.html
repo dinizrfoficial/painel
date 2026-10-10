@@ -593,22 +593,37 @@ a{color:inherit}
 /* Modal */
 .modal-backdrop{
   position:fixed;inset:0;z-index:70;
-  display:grid;place-items:center;padding:18px;
+  display:grid;place-items:center;padding:clamp(8px,2vw,18px);
+  overflow-y:auto;overscroll-behavior:contain;
   background:rgba(0,0,0,.64);
   opacity:0;pointer-events:none;transition:.18s;
 }
 .modal-backdrop.show{opacity:1;pointer-events:auto}
 .modal{
   width:min(540px,100%);
+  max-height:calc(100dvh - 24px);
+  display:flex;flex-direction:column;
+  min-height:0;
+  overflow:hidden;
   background:linear-gradient(180deg,#0e1e30,#0a1725);
   border:1px solid #2d4a66;
   border-radius:20px;
   box-shadow:var(--shadow);
-  padding:22px;
+  padding:0;
 }
+.modal-header{padding:20px 22px 8px;flex:none}
 .modal h3{margin:0 0 8px;font-size:20px;letter-spacing:-.025em}
 .modal p{margin:0 0 15px;color:var(--muted);font-size:12.5px;line-height:1.55}
-.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.modal-scroll{
+  overflow-y:auto;min-height:0;flex:1 1 auto;overscroll-behavior:contain;
+  padding:8px 22px 16px;scrollbar-width:thin;
+}
+.modal-fields{min-width:0}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;
+  margin-top:0;padding:14px 22px;flex:none;
+  border-top:1px solid #243d55;background:#0a192a}
+@media(max-height:600px){.modal-header{padding-top:12px}.modal-scroll{padding-top:2px}.modal-actions{padding:9px 15px}}
+@media(max-width:480px){.modal-header{padding-left:15px;padding-right:15px}.modal-scroll{padding-left:15px;padding-right:15px}.modal-actions{padding-left:15px;padding-right:15px}.modal-actions .btn{flex:1;min-width:0}}
 .checkbox{display:flex;gap:9px;align-items:flex-start;color:#bccdde;font-size:12px;margin-top:12px}
 .checkbox input{margin-top:2px}
 
@@ -890,10 +905,12 @@ a{color:inherit}
 </div>
 
 <div id="modalBackdrop" class="modal-backdrop">
-  <div class="modal">
-    <h3 id="modalTitle"></h3>
-    <p id="modalText"></p>
-    <div id="modalFields"></div>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header"><h3 id="modalTitle"></h3></div>
+    <div class="modal-scroll" id="modalScroll">
+      <p id="modalText"></p>
+      <div id="modalFields" class="modal-fields"></div>
+    </div>
     <div class="modal-actions">
       <button id="modalCancel" class="btn btn-ghost">Cancelar</button>
       <button id="modalOk" class="btn btn-primary">Confirmar</button>
@@ -1113,11 +1130,15 @@ function renderUsers(){
       trialActions+='<button class="btn btn-ghost btn-sm" data-action="renewal-link" data-id="'+esc(u.uid)+'">Link de renovação</button>';
       trialActions+='<button class="btn btn-ghost btn-sm" data-action="renewal-revoke" data-id="'+esc(u.uid)+'">Revogar link</button>';
     }
+    var paymentEmailAction=(!u.banned&&u.email&&u.emailVerified&&
+      ((pending&&u.accountStatus==='pending_payment') ||
+       (!pending&&(u.contributionRequired||u.trialStartedAt||u.accessType==='paid'))))
+      ? '<button class="btn btn-ghost btn-sm" data-action="send-payment-link" data-id="'+esc(u.uid)+'">Reenviar link de pagamento</button>' : '';
     var adminGrantAction=(!u.banned&&(!pending || (u.accountStatus==='pending_payment'&&u.emailVerified)))
       ? '<button class="btn btn-green btn-sm" data-action="admin-grant" data-id="'+esc(u.uid)+'">Liberar acesso</button>' : '';
     var actions=pending
-      ? verifyAction+adminGrantAction+'<button class="btn btn-danger btn-sm" data-action="delete-user" data-id="'+esc(u.uid)+'">Cancelar cadastro</button>'
-      : verifyAction+contributionAction+trialActions+adminGrantAction+'<button class="btn btn-ghost btn-sm" data-action="update-user" data-id="'+esc(u.uid)+'">Atualizar</button>'+(u.banned?'<button class="btn btn-green btn-sm" data-action="unban-user" data-id="'+esc(u.uid)+'">Desbloquear</button>':'<button class="btn btn-warn btn-sm" data-action="ban-user" data-id="'+esc(u.uid)+'">Banir conta</button>')+'<button class="btn btn-danger btn-sm" data-action="delete-user" data-id="'+esc(u.uid)+'">Excluir</button>';
+      ? verifyAction+paymentEmailAction+adminGrantAction+'<button class="btn btn-danger btn-sm" data-action="delete-user" data-id="'+esc(u.uid)+'">Cancelar cadastro</button>'
+      : verifyAction+contributionAction+trialActions+paymentEmailAction+adminGrantAction+'<button class="btn btn-ghost btn-sm" data-action="update-user" data-id="'+esc(u.uid)+'">Atualizar</button>'+(u.banned?'<button class="btn btn-green btn-sm" data-action="unban-user" data-id="'+esc(u.uid)+'">Desbloquear</button>':'<button class="btn btn-warn btn-sm" data-action="ban-user" data-id="'+esc(u.uid)+'">Banir conta</button>')+'<button class="btn btn-danger btn-sm" data-action="delete-user" data-id="'+esc(u.uid)+'">Excluir</button>';
     return '<tr><td><div class="name">'+esc(u.name)+'</div><div class="mono">'+esc(u.uid)+'</div></td><td>'+esc(u.email||'—')+'</td><td>'+conn+'</td><td>'+u.channelCount+'</td><td>'+acc+'</td><td><div class="actions">'+actions+'</div></td></tr>';
   }).join('');
  }
@@ -1201,6 +1222,7 @@ function closeDrawer(){els.drawerBackdrop.classList.remove('show');state.selecte
 var modalResolve=null;
 function modal(opts){
   els.modalTitle.textContent=opts.title||'Confirmar';els.modalText.textContent=opts.text||'';els.modalFields.innerHTML=opts.html||'';els.modalOk.textContent=opts.okText||'Confirmar';els.modalOk.className='btn '+(opts.danger?'btn-danger':'btn-primary');els.modalBackdrop.classList.add('show');
+  var scroll=$('modalScroll');if(scroll)scroll.scrollTop=0;
   return new Promise(function(resolve){modalResolve=resolve;});
 }
 function modalDone(ok){els.modalBackdrop.classList.remove('show');var r=modalResolve;modalResolve=null;if(r)r(ok);}
@@ -1433,6 +1455,22 @@ async function actionRevokeRenewalLink(uid){
   if(!ok)return;
   await runAction('/api/master/users/renewal-link',{userId:uid,action:'revoke'},'Link revogado.');
 }
+async function actionSendPaymentLink(uid){
+  var u=getUser(uid);if(!u)return;
+  if(!u.email||!u.emailVerified){toast('O e-mail da conta precisa estar confirmado.','error');return;}
+  var ok=await modal({title:'Reenviar link de pagamento',
+    text:'Enviar um novo link temporário para '+u.email+'? O link anterior será invalidado. Esta ação não aprova pagamentos nem modifica a validade da conta.',
+    html:'<div class="hint">O usuário abrirá o site zlinktalk.com.br/renovar/, escolherá o período e pagará pelo Mercado Pago. Um novo envio para esta conta só poderá ocorrer após 5 minutos.</div>',
+    okText:'Enviar e-mail'});
+  if(!ok)return;
+  setLoading(true);
+  try{
+    var data=await api('/api/master/users/send-payment-link','POST',{userId:uid});
+    toast('Link enviado para '+(data.email||u.email)+'.','ok');
+    await refresh(true);
+  }catch(e){toast(e.message,'error');}
+  setLoading(false);
+}
 async function actionRenewalLink(uid){
   var u=getUser(uid);if(!u)return;
   var ok=await modal({title:'Gerar link de renovação',
@@ -1461,7 +1499,7 @@ async function deleteChannel(id){var c=getChannel(id);if(!c)return;var ok=await 
 async function runAction(path,body,success){setLoading(true);try{await api(path,'POST',body);toast(success,'ok');await refresh(true);}catch(e){toast(e.message,'error');}setLoading(false);}
 
 function clickAction(e){var b=e.target.closest('[data-action]');if(!b)return;var a=b.getAttribute('data-action'),id=b.getAttribute('data-id'),uid=b.getAttribute('data-user');
-  if(a==='open-channel')openChannel(id);else if(a==='listen'){els.monitorAllToggle.checked=false;audio.start(id);}else if(a==='rename-channel')actionRenameChannel(id);else if(a==='resend-verification')actionResendVerification(id);else if(a==='contribution-on')actionContributionRequirement(id,true);else if(a==='contribution-off')actionContributionRequirement(id,false);else if(a==='trial-define')actionTrial(id,'define');else if(a==='trial-extend')actionTrial(id,'extend');else if(a==='trial-end')actionTrial(id,'end');else if(a==='admin-grant')actionAdminGrant(id);else if(a==='renewal-link')actionRenewalLink(id);else if(a==='renewal-revoke')actionRevokeRenewalLink(id);else if(a==='update-user')actionUpdateUser(id);else if(a==='delete-user')actionDeleteUser(id);else if(a==='rename-user')actionRenameUser(id);else if(a==='ban-user')actionBanUser(id);else if(a==='unban-user')actionUnbanUser(id);else if(a==='mod-on')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:true},'Usuário promovido a Moderador.');else if(a==='mod-off')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:false},'Moderação removida.');else if(a==='channel-block')runMemberAction('/api/master/channels/block-user',uid,{},'Usuário bloqueado no canal.','O usuário será impedido de participar deste canal.');else if(a==='channel-unblock')runMemberAction('/api/master/channels/unblock-user',uid,{},'Usuário desbloqueado no canal.');else if(a==='remove-member')runMemberAction('/api/master/channels/remove-user',uid,{},'Usuário removido do canal.','O usuário será removido da lista deste canal.');else if(a==='transfer-owner')transferOwner();else if(a==='delete-channel')deleteChannel(id||state.selectedChannelId);
+  if(a==='open-channel')openChannel(id);else if(a==='listen'){els.monitorAllToggle.checked=false;audio.start(id);}else if(a==='rename-channel')actionRenameChannel(id);else if(a==='resend-verification')actionResendVerification(id);else if(a==='contribution-on')actionContributionRequirement(id,true);else if(a==='contribution-off')actionContributionRequirement(id,false);else if(a==='trial-define')actionTrial(id,'define');else if(a==='trial-extend')actionTrial(id,'extend');else if(a==='trial-end')actionTrial(id,'end');else if(a==='admin-grant')actionAdminGrant(id);else if(a==='renewal-link')actionRenewalLink(id);else if(a==='send-payment-link')actionSendPaymentLink(id);else if(a==='renewal-revoke')actionRevokeRenewalLink(id);else if(a==='update-user')actionUpdateUser(id);else if(a==='delete-user')actionDeleteUser(id);else if(a==='rename-user')actionRenameUser(id);else if(a==='ban-user')actionBanUser(id);else if(a==='unban-user')actionUnbanUser(id);else if(a==='mod-on')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:true},'Usuário promovido a Moderador.');else if(a==='mod-off')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:false},'Moderação removida.');else if(a==='channel-block')runMemberAction('/api/master/channels/block-user',uid,{},'Usuário bloqueado no canal.','O usuário será impedido de participar deste canal.');else if(a==='channel-unblock')runMemberAction('/api/master/channels/unblock-user',uid,{},'Usuário desbloqueado no canal.');else if(a==='remove-member')runMemberAction('/api/master/channels/remove-user',uid,{},'Usuário removido do canal.','O usuário será removido da lista deste canal.');else if(a==='transfer-owner')transferOwner();else if(a==='delete-channel')deleteChannel(id||state.selectedChannelId);
 }
 
 var audio={
