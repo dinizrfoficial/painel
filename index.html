@@ -796,6 +796,7 @@ a{color:inherit}
     <div class="conn"><span id="connDot" class="dot"></span><span id="connText">Conectando</span></div>
     <button id="createUserBtn" class="btn btn-primary btn-sm">Criar conta</button>
     <button id="accountLimitBtn" class="btn btn-ghost btn-sm">Limite de contas</button>
+    <button id="channelCreationLimitBtn" class="btn btn-ghost btn-sm">Limite de canais</button>
     <button id="registrationPolicyBtn" class="btn btn-ghost btn-sm">Novos cadastros</button>
     <button id="refreshBtn" class="btn btn-ghost btn-sm">Atualizar</button>
     <button id="logoutBtn" class="btn btn-ghost btn-sm">Sair</button>
@@ -940,7 +941,7 @@ var state={server:'',token:'',overview:null,tab:'channels',search:'',selectedCha
 var $=function(id){return document.getElementById(id)};
 var els={
   loginView:$('loginView'),appView:$('appView'),serverInput:$('serverInput'),tokenInput:$('tokenInput'),loginBtn:$('loginBtn'),loginError:$('loginError'),
-  connDot:$('connDot'),connText:$('connText'),createUserBtn:$('createUserBtn'),accountLimitBtn:$('accountLimitBtn'),registrationPolicyBtn:$('registrationPolicyBtn'),refreshBtn:$('refreshBtn'),logoutBtn:$('logoutBtn'),searchInput:$('searchInput'),channelsPanel:$('channelsPanel'),usersPanel:$('usersPanel'),unverifiedPanel:$('unverifiedPanel'),channelsBody:$('channelsBody'),usersBody:$('usersBody'),unverifiedBody:$('unverifiedBody'),channelCount:$('channelCount'),userCount:$('userCount'),unverifiedCount:$('unverifiedCount'),unverifiedHelp:$('unverifiedHelp'),
+  connDot:$('connDot'),connText:$('connText'),createUserBtn:$('createUserBtn'),accountLimitBtn:$('accountLimitBtn'),channelCreationLimitBtn:$('channelCreationLimitBtn'),registrationPolicyBtn:$('registrationPolicyBtn'),refreshBtn:$('refreshBtn'),logoutBtn:$('logoutBtn'),searchInput:$('searchInput'),channelsPanel:$('channelsPanel'),usersPanel:$('usersPanel'),unverifiedPanel:$('unverifiedPanel'),channelsBody:$('channelsBody'),usersBody:$('usersBody'),unverifiedBody:$('unverifiedBody'),channelCount:$('channelCount'),userCount:$('userCount'),unverifiedCount:$('unverifiedCount'),unverifiedHelp:$('unverifiedHelp'),
   statUsers:$('statUsers'),statOnline:$('statOnline'),statBanned:$('statBanned'),statUnverifiedEmails:$('statUnverifiedEmails'),statChannels:$('statChannels'),statTx:$('statTx'),statRegistrationMode:$('statRegistrationMode'),statRegistrationModeFoot:$('statRegistrationModeFoot'),statAccountLimit:$('statAccountLimit'),statAccountLimitFoot:$('statAccountLimitFoot'),drawerBackdrop:$('drawerBackdrop'),drawerTitle:$('drawerTitle'),drawerSub:$('drawerSub'),drawerBody:$('drawerBody'),drawerClose:$('drawerClose'),modalBackdrop:$('modalBackdrop'),modalTitle:$('modalTitle'),modalText:$('modalText'),modalFields:$('modalFields'),modalCancel:$('modalCancel'),modalOk:$('modalOk'),toast:$('toast'),main:$('main'),audioDock:$('audioDock'),audioTitle:$('audioTitle'),audioStatus:$('audioStatus'),volumeRange:$('volumeRange'),audioStop:$('audioStop'),monitorAllToggle:$('monitorAllToggle')
 };
 
@@ -948,7 +949,7 @@ function esc(v){return String(v==null?'':v).replace(/[&<>'"]/g,function(c){retur
 function normalizeServer(v){return String(v||'').trim().replace(/\/+$/,'');}
 function toast(msg,type){els.toast.textContent=msg;els.toast.className='toast show '+(type||'');clearTimeout(toast.t);toast.t=setTimeout(function(){els.toast.className='toast';},3200);}
 function setConnection(ok,text){els.connDot.className='dot '+(ok?'ok':'err');els.connText.textContent=text;}
-function setLoading(v){state.loading=v;els.main.classList.toggle('loading',v);els.refreshBtn.disabled=v;els.createUserBtn.disabled=v;els.accountLimitBtn.disabled=v;els.registrationPolicyBtn.disabled=v;}
+function setLoading(v){state.loading=v;els.main.classList.toggle('loading',v);els.refreshBtn.disabled=v;els.createUserBtn.disabled=v;els.accountLimitBtn.disabled=v;els.channelCreationLimitBtn.disabled=v;els.registrationPolicyBtn.disabled=v;}
 function fmtDate(ts){if(!ts)return '—';try{return new Date(ts).toLocaleString('pt-BR');}catch(e){return '—';}}
 function roleLabel(role){return role==='owner'?'Administrador':role==='moderator'?'Moderador':'Usuário';}
 function badge(text,cls){return '<span class="badge '+(cls||'')+'">'+esc(text)+'</span>';}
@@ -1120,6 +1121,8 @@ function renderUsers(){
         contributionAction='<button class="btn btn-warn btn-sm" data-action="contribution-on" data-id="'+esc(u.uid)+'">Exigir contribuição</button>';
       }
     }
+    var creationLabel = u.channelCreationLimit === 0 ? 'Sem limite' : (u.ownedChannelCount || 0) + '/' + u.channelCreationLimit;
+    var channelLimitAction = !pending ? '<button class="btn btn-ghost btn-sm" data-action="channel-creation-limit" data-id="'+esc(u.uid)+'">Criar canais: '+esc(creationLabel)+'</button>' : '';
     var trialActions='';
     if(!pending){
       trialActions='<button class="btn btn-ghost btn-sm" data-action="trial-define" data-id="'+esc(u.uid)+'">Definir degustação</button>';
@@ -1138,7 +1141,7 @@ function renderUsers(){
       ? '<button class="btn btn-green btn-sm" data-action="admin-grant" data-id="'+esc(u.uid)+'">Liberar acesso</button>' : '';
     var actions=pending
       ? verifyAction+paymentEmailAction+adminGrantAction+'<button class="btn btn-danger btn-sm" data-action="delete-user" data-id="'+esc(u.uid)+'">Cancelar cadastro</button>'
-      : verifyAction+contributionAction+trialActions+paymentEmailAction+adminGrantAction+'<button class="btn btn-ghost btn-sm" data-action="update-user" data-id="'+esc(u.uid)+'">Atualizar</button>'+(u.banned?'<button class="btn btn-green btn-sm" data-action="unban-user" data-id="'+esc(u.uid)+'">Desbloquear</button>':'<button class="btn btn-warn btn-sm" data-action="ban-user" data-id="'+esc(u.uid)+'">Banir conta</button>')+'<button class="btn btn-danger btn-sm" data-action="delete-user" data-id="'+esc(u.uid)+'">Excluir</button>';
+      : verifyAction+contributionAction+trialActions+paymentEmailAction+adminGrantAction+channelLimitAction+'<button class="btn btn-ghost btn-sm" data-action="update-user" data-id="'+esc(u.uid)+'">Atualizar</button>'+(u.banned?'<button class="btn btn-green btn-sm" data-action="unban-user" data-id="'+esc(u.uid)+'">Desbloquear</button>':'<button class="btn btn-warn btn-sm" data-action="ban-user" data-id="'+esc(u.uid)+'">Banir conta</button>')+'<button class="btn btn-danger btn-sm" data-action="delete-user" data-id="'+esc(u.uid)+'">Excluir</button>';
     return '<tr><td><div class="name">'+esc(u.name)+'</div><div class="mono">'+esc(u.uid)+'</div></td><td>'+esc(u.email||'—')+'</td><td>'+conn+'</td><td>'+u.channelCount+'</td><td>'+acc+'</td><td><div class="actions">'+actions+'</div></td></tr>';
   }).join('');
  }
@@ -1316,6 +1319,31 @@ async function actionAccountLimit(){
   var value=Number($('accountLimitValue').value);
   if(!Number.isInteger(value)||value<0||value>1000000){toast('Informe um número inteiro entre 0 e 1000000.','error');return;}
   await runAction('/api/master/settings/account-limit',{maxAccounts:value},value===0?'Limite removido.':'Limite atualizado para '+value+' contas.');
+}
+
+async function actionChannelCreationDefaultLimit(){
+  var policy=(state.overview&&state.overview.channelCreationPolicy)||{};
+  var current=Number(policy.defaultLimit||0);
+  var ok=await modal({title:'Limite de criação de canais — geral',
+    text:'Define quantos canais cada conta poderá criar. Os canais já existentes não serão excluídos. Exceções individuais continuam valendo.',
+    html:'<div class="field"><label>Máximo de canais criados por usuário</label><input id="channelDefaultLimitValue" class="input" type="number" min="0" max="100000" step="1" value="'+current+'"></div><div class="hint">0 = sem limite. Esse limite não restringe a participação em canais de terceiros.</div>',okText:'Salvar limite geral'});
+  if(!ok)return;
+  var v=Number($('channelDefaultLimitValue').value);
+  if(!Number.isInteger(v)||v<0||v>100000){toast('Informe um número inteiro entre 0 e 100000.','error');return;}
+  await runAction('/api/master/settings/channel-creation-limit',{limit:v},'Limite geral de criação de canais atualizado.');
+}
+async function actionUserChannelCreationLimit(uid){
+  var u=getUser(uid);if(!u)return;
+  var override=u.channelCreationOverride;
+  var general=Number(((state.overview||{}).channelCreationPolicy||{}).defaultLimit||0);
+  var inherited=override===null||override===undefined;
+  var ok=await modal({title:'Limite de canais — '+u.name,
+    text:'Este usuário possui '+Number(u.ownedChannelCount||0)+' canal(is) criado(s). Limite geral: '+(general||'sem limite')+'.',
+    html:'<div class="field"><label>Aplicar regra</label><select class="input" id="channelUserMode"><option value="inherit" '+(inherited?'selected':'')+'>Usar limite geral</option><option value="custom" '+(!inherited?'selected':'')+'>Definir exceção individual</option></select></div><div class="field"><label>Limite individual (0 = sem limite)</label><input id="channelUserLimitValue" class="input" type="number" min="0" max="100000" step="1" value="'+(inherited?general:Number(override))+'"></div><div class="hint">Somente a criação de novos canais será afetada. Canais existentes não serão removidos.</div>',okText:'Salvar limite'});
+  if(!ok)return;
+  var inherit=$('channelUserMode').value==='inherit',v=Number($('channelUserLimitValue').value);
+  if(!inherit&&(!Number.isInteger(v)||v<0||v>100000)){toast('Limite individual inválido.','error');return;}
+  await runAction('/api/master/users/channel-creation-limit',{userId:uid,inherit:inherit,limit:inherit?0:v},'Limite individual atualizado.');
 }
 
 async function actionRegistrationPolicy(){
@@ -1499,7 +1527,7 @@ async function deleteChannel(id){var c=getChannel(id);if(!c)return;var ok=await 
 async function runAction(path,body,success){setLoading(true);try{await api(path,'POST',body);toast(success,'ok');await refresh(true);}catch(e){toast(e.message,'error');}setLoading(false);}
 
 function clickAction(e){var b=e.target.closest('[data-action]');if(!b)return;var a=b.getAttribute('data-action'),id=b.getAttribute('data-id'),uid=b.getAttribute('data-user');
-  if(a==='open-channel')openChannel(id);else if(a==='listen'){els.monitorAllToggle.checked=false;audio.start(id);}else if(a==='rename-channel')actionRenameChannel(id);else if(a==='resend-verification')actionResendVerification(id);else if(a==='contribution-on')actionContributionRequirement(id,true);else if(a==='contribution-off')actionContributionRequirement(id,false);else if(a==='trial-define')actionTrial(id,'define');else if(a==='trial-extend')actionTrial(id,'extend');else if(a==='trial-end')actionTrial(id,'end');else if(a==='admin-grant')actionAdminGrant(id);else if(a==='renewal-link')actionRenewalLink(id);else if(a==='send-payment-link')actionSendPaymentLink(id);else if(a==='renewal-revoke')actionRevokeRenewalLink(id);else if(a==='update-user')actionUpdateUser(id);else if(a==='delete-user')actionDeleteUser(id);else if(a==='rename-user')actionRenameUser(id);else if(a==='ban-user')actionBanUser(id);else if(a==='unban-user')actionUnbanUser(id);else if(a==='mod-on')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:true},'Usuário promovido a Moderador.');else if(a==='mod-off')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:false},'Moderação removida.');else if(a==='channel-block')runMemberAction('/api/master/channels/block-user',uid,{},'Usuário bloqueado no canal.','O usuário será impedido de participar deste canal.');else if(a==='channel-unblock')runMemberAction('/api/master/channels/unblock-user',uid,{},'Usuário desbloqueado no canal.');else if(a==='remove-member')runMemberAction('/api/master/channels/remove-user',uid,{},'Usuário removido do canal.','O usuário será removido da lista deste canal.');else if(a==='transfer-owner')transferOwner();else if(a==='delete-channel')deleteChannel(id||state.selectedChannelId);
+  if(a==='open-channel')openChannel(id);else if(a==='listen'){els.monitorAllToggle.checked=false;audio.start(id);}else if(a==='rename-channel')actionRenameChannel(id);else if(a==='resend-verification')actionResendVerification(id);else if(a==='contribution-on')actionContributionRequirement(id,true);else if(a==='contribution-off')actionContributionRequirement(id,false);else if(a==='trial-define')actionTrial(id,'define');else if(a==='trial-extend')actionTrial(id,'extend');else if(a==='trial-end')actionTrial(id,'end');else if(a==='admin-grant')actionAdminGrant(id);else if(a==='channel-creation-limit')actionUserChannelCreationLimit(id);else if(a==='renewal-link')actionRenewalLink(id);else if(a==='send-payment-link')actionSendPaymentLink(id);else if(a==='renewal-revoke')actionRevokeRenewalLink(id);else if(a==='update-user')actionUpdateUser(id);else if(a==='delete-user')actionDeleteUser(id);else if(a==='rename-user')actionRenameUser(id);else if(a==='ban-user')actionBanUser(id);else if(a==='unban-user')actionUnbanUser(id);else if(a==='mod-on')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:true},'Usuário promovido a Moderador.');else if(a==='mod-off')runMemberAction('/api/master/channels/set-moderator',uid,{moderator:false},'Moderação removida.');else if(a==='channel-block')runMemberAction('/api/master/channels/block-user',uid,{},'Usuário bloqueado no canal.','O usuário será impedido de participar deste canal.');else if(a==='channel-unblock')runMemberAction('/api/master/channels/unblock-user',uid,{},'Usuário desbloqueado no canal.');else if(a==='remove-member')runMemberAction('/api/master/channels/remove-user',uid,{},'Usuário removido do canal.','O usuário será removido da lista deste canal.');else if(a==='transfer-owner')transferOwner();else if(a==='delete-channel')deleteChannel(id||state.selectedChannelId);
 }
 
 var audio={
@@ -1814,7 +1842,7 @@ var audio={
   }
 };
 
-els.loginBtn.addEventListener('click',login);els.tokenInput.addEventListener('keydown',function(e){if(e.key==='Enter')login();});els.createUserBtn.addEventListener('click',actionCreateUser);els.accountLimitBtn.addEventListener('click',actionAccountLimit);els.registrationPolicyBtn.addEventListener('click',actionRegistrationPolicy);els.refreshBtn.addEventListener('click',function(){refresh(false);});els.logoutBtn.addEventListener('click',logout);els.searchInput.addEventListener('input',function(){state.search=this.value.trim();renderChannels();renderUsers();renderUnverifiedUsers();});
+els.loginBtn.addEventListener('click',login);els.tokenInput.addEventListener('keydown',function(e){if(e.key==='Enter')login();});els.createUserBtn.addEventListener('click',actionCreateUser);els.accountLimitBtn.addEventListener('click',actionAccountLimit);els.channelCreationLimitBtn.addEventListener('click',actionChannelCreationDefaultLimit);els.registrationPolicyBtn.addEventListener('click',actionRegistrationPolicy);els.refreshBtn.addEventListener('click',function(){refresh(false);});els.logoutBtn.addEventListener('click',logout);els.searchInput.addEventListener('input',function(){state.search=this.value.trim();renderChannels();renderUsers();renderUnverifiedUsers();});
 document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});t.classList.add('active');state.tab=t.getAttribute('data-tab');els.channelsPanel.classList.toggle('hidden',state.tab!=='channels');els.usersPanel.classList.toggle('hidden',state.tab!=='users');els.unverifiedPanel.classList.toggle('hidden',state.tab!=='unverified');});});
 els.channelsBody.addEventListener('click',clickAction);els.usersBody.addEventListener('click',clickAction);els.unverifiedBody.addEventListener('click',clickAction);els.drawerBody.addEventListener('click',clickAction);els.drawerClose.addEventListener('click',closeDrawer);els.drawerBackdrop.addEventListener('click',function(e){if(e.target===els.drawerBackdrop)closeDrawer();});els.modalCancel.addEventListener('click',function(){modalDone(false);});els.modalOk.addEventListener('click',function(){modalDone(true);});els.modalBackdrop.addEventListener('click',function(e){if(e.target===els.modalBackdrop)modalDone(false);});els.audioStop.addEventListener('click',function(){audio.stop();});els.volumeRange.addEventListener('input',function(){audio.setVolume(this.value);});
 els.monitorAllToggle.addEventListener('change',function(){if(this.checked){audio.startAll();}else if(audio.mode==='all'){audio.stop(false);}});
