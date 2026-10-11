@@ -534,6 +534,19 @@ a{color:inherit}
 .actions{display:flex;gap:6px;flex-wrap:wrap}
 .empty{padding:48px;text-align:center;color:#708aa3}
 
+/* Contas por situação e progresso de confirmação em lote */
+.account-filter-bar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:13px 17px;border-bottom:1px solid #1b334c}
+.account-filter-tabs{display:flex;gap:6px;flex-wrap:wrap;min-width:0}
+.account-filter{border:1px solid #29445d;background:#0b2134;color:#a7bfd6;padding:9px 11px;border-radius:10px;font:inherit;font-size:11px;font-weight:750;cursor:pointer}
+.account-filter span{display:inline-block;border-radius:7px;background:#1a3852;padding:1px 6px;margin-left:3px;font-variant-numeric:tabular-nums}
+.account-filter.active{color:#e6f6ff;background:#174368;border-color:#4a9cd5}
+.inactive-days-label{display:flex;gap:7px;align-items:center;flex-wrap:wrap;color:#8da8c3;font-size:11px}
+.inactive-days-label .input{width:auto;min-width:110px;padding:8px 10px}
+.email-bulk-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-left:auto}
+.bulk-verification-status{font-size:11px;color:#8fb1cd;padding:10px 18px;border-bottom:1px solid #203852;line-height:1.45}
+.bulk-verification-status.warning{color:#ffca83}
+@media(max-width:700px){.account-filter-bar{display:block}.inactive-days-label{margin-top:12px}.email-bulk-actions{justify-content:flex-start}}
+
 /* Drawer */
 .drawer-backdrop{
   position:fixed;inset:0;z-index:50;
@@ -859,8 +872,24 @@ a{color:inherit}
 
     <section id="usersPanel" class="panel hidden">
       <div class="panel-head">
-        <h2>Todos os usuários</h2>
+        <div>
+          <h2>Contas por situação</h2>
+          <div class="sub">As contas são classificadas sem misturar bloqueio administrativo com vencimento de contribuição.</div>
+        </div>
         <span id="userCount" class="count"></span>
+      </div>
+      <div class="account-filter-bar">
+        <div class="account-filter-tabs" id="userStatusTabs" role="group" aria-label="Filtrar situação dos usuários">
+          <button class="account-filter active" data-user-status="all">Todos <span data-status-count="all">0</span></button>
+          <button class="account-filter" data-user-status="active">Ativos <span data-status-count="active">0</span></button>
+          <button class="account-filter" data-user-status="blocked">Bloqueados <span data-status-count="blocked">0</span></button>
+          <button class="account-filter" data-user-status="payment">Suspensos por contribuição <span data-status-count="payment">0</span></button>
+          <button class="account-filter" data-user-status="inactive">Inativos há muito tempo <span data-status-count="inactive">0</span></button>
+          <button class="account-filter" data-user-status="pending">Cadastros pendentes <span data-status-count="pending">0</span></button>
+        </div>
+        <label class="inactive-days-label" for="userInactiveDays">Considerar inativo após
+          <select class="input" id="userInactiveDays"><option value="30">30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option><option value="180">180 dias</option></select>
+        </label>
       </div>
       <div class="table-wrap">
         <table class="table">
@@ -878,8 +907,13 @@ a{color:inherit}
           <h2>E-mails não verificados</h2>
           <div id="unverifiedHelp" class="sub">Contas do Firebase que ainda aguardam confirmação do endereço de e-mail.</div>
         </div>
-        <span id="unverifiedCount" class="count"></span>
+        <div class="email-bulk-actions">
+          <span id="unverifiedCount" class="count"></span>
+          <button id="sendBulkVerificationBtn" class="btn btn-green btn-sm">Enviar confirmação em lote</button>
+          <button id="stopBulkVerificationBtn" class="btn btn-ghost btn-sm hidden">Interromper envios</button>
+        </div>
       </div>
+      <div id="bulkVerificationStatus" class="bulk-verification-status" role="status" aria-live="polite">Envie um novo convite a todas as contas elegíveis com um único comando. Contas legadas são opcionais.</div>
       <div class="table-wrap">
         <table class="table">
           <thead>
@@ -937,11 +971,11 @@ a{color:inherit}
 (function(){
 'use strict';
 
-var state={server:'',token:'',overview:null,tab:'channels',search:'',selectedChannelId:null,loading:false};
+var state={server:'',token:'',overview:null,tab:'channels',search:'',selectedChannelId:null,loading:false,userStatus:'all',inactiveDays:30,bulkPollTimer:null,bulkRunning:false};
 var $=function(id){return document.getElementById(id)};
 var els={
   loginView:$('loginView'),appView:$('appView'),serverInput:$('serverInput'),tokenInput:$('tokenInput'),loginBtn:$('loginBtn'),loginError:$('loginError'),
-  connDot:$('connDot'),connText:$('connText'),createUserBtn:$('createUserBtn'),accountLimitBtn:$('accountLimitBtn'),channelCreationLimitBtn:$('channelCreationLimitBtn'),registrationPolicyBtn:$('registrationPolicyBtn'),refreshBtn:$('refreshBtn'),logoutBtn:$('logoutBtn'),searchInput:$('searchInput'),channelsPanel:$('channelsPanel'),usersPanel:$('usersPanel'),unverifiedPanel:$('unverifiedPanel'),channelsBody:$('channelsBody'),usersBody:$('usersBody'),unverifiedBody:$('unverifiedBody'),channelCount:$('channelCount'),userCount:$('userCount'),unverifiedCount:$('unverifiedCount'),unverifiedHelp:$('unverifiedHelp'),
+  connDot:$('connDot'),connText:$('connText'),createUserBtn:$('createUserBtn'),accountLimitBtn:$('accountLimitBtn'),channelCreationLimitBtn:$('channelCreationLimitBtn'),registrationPolicyBtn:$('registrationPolicyBtn'),refreshBtn:$('refreshBtn'),logoutBtn:$('logoutBtn'),searchInput:$('searchInput'),channelsPanel:$('channelsPanel'),usersPanel:$('usersPanel'),unverifiedPanel:$('unverifiedPanel'),channelsBody:$('channelsBody'),usersBody:$('usersBody'),unverifiedBody:$('unverifiedBody'),channelCount:$('channelCount'),userCount:$('userCount'),unverifiedCount:$('unverifiedCount'),unverifiedHelp:$('unverifiedHelp'),userStatusTabs:$('userStatusTabs'),userInactiveDays:$('userInactiveDays'),sendBulkVerificationBtn:$('sendBulkVerificationBtn'),stopBulkVerificationBtn:$('stopBulkVerificationBtn'),bulkVerificationStatus:$('bulkVerificationStatus'),
   statUsers:$('statUsers'),statOnline:$('statOnline'),statBanned:$('statBanned'),statUnverifiedEmails:$('statUnverifiedEmails'),statChannels:$('statChannels'),statTx:$('statTx'),statRegistrationMode:$('statRegistrationMode'),statRegistrationModeFoot:$('statRegistrationModeFoot'),statAccountLimit:$('statAccountLimit'),statAccountLimitFoot:$('statAccountLimitFoot'),drawerBackdrop:$('drawerBackdrop'),drawerTitle:$('drawerTitle'),drawerSub:$('drawerSub'),drawerBody:$('drawerBody'),drawerClose:$('drawerClose'),modalBackdrop:$('modalBackdrop'),modalTitle:$('modalTitle'),modalText:$('modalText'),modalFields:$('modalFields'),modalCancel:$('modalCancel'),modalOk:$('modalOk'),toast:$('toast'),main:$('main'),audioDock:$('audioDock'),audioTitle:$('audioTitle'),audioStatus:$('audioStatus'),volumeRange:$('volumeRange'),audioStop:$('audioStop'),monitorAllToggle:$('monitorAllToggle')
 };
 
@@ -1001,6 +1035,7 @@ async function login(){
     setConnection(true,'Conectado');
     render();
     startAutoRefresh();
+    refreshVerificationBulkStatus();
   }catch(e){
     state.token='';
     setConnection(false,'Falha');
@@ -1015,7 +1050,7 @@ async function login(){
   els.loginBtn.disabled=false;
 }
 
-function logout(){audio.stop();els.monitorAllToggle.checked=false;stopAutoRefresh();sessionStorage.removeItem('zlinkMasterToken');state.token='';state.overview=null;els.appView.classList.add('hidden');els.loginView.classList.remove('hidden','authenticating','login-success','login-failed');els.loginBtn.classList.remove('is-loading');els.loginBtn.textContent='Entrar na Central de Controle';els.loginBtn.disabled=false;els.tokenInput.value='';}
+function logout(){if(state.bulkPollTimer)clearTimeout(state.bulkPollTimer);state.bulkPollTimer=null;audio.stop();els.monitorAllToggle.checked=false;stopAutoRefresh();sessionStorage.removeItem('zlinkMasterToken');state.token='';state.overview=null;els.appView.classList.add('hidden');els.loginView.classList.remove('hidden','authenticating','login-success','login-failed');els.loginBtn.classList.remove('is-loading');els.loginBtn.textContent='Entrar na Central de Controle';els.loginBtn.disabled=false;els.tokenInput.value='';}
 
 async function refresh(silent){
   if(!state.token||state.loading)return;
@@ -1039,6 +1074,7 @@ function render(){
   if(registration.unlimited||!Number(registration.maxAccounts||0)){els.statAccountLimit.textContent='Sem limite';els.statAccountLimitFoot.textContent=Number(registration.accountCount||o.stats.users||0)+' contas cadastradas';}
   else{var reserved=Number(registration.reservedCount||0),available=Number(registration.availableAccounts||0);els.statAccountLimit.textContent=Number(registration.accountCount||0)+' / '+Number(registration.maxAccounts||0);els.statAccountLimitFoot.textContent=available+' vagas disponíveis'+(reserved?' • '+reserved+' em cadastro':'');}
   renderChannels();renderUsers();renderUnverifiedUsers();
+  els.sendBulkVerificationBtn.disabled=state.bulkRunning || !((o.emailVerification||{}).resendConfigured);
   if(state.selectedChannelId&&els.drawerBackdrop.classList.contains('show'))openChannel(state.selectedChannelId,true);
 }
 
@@ -1058,8 +1094,29 @@ function renderChannels(){
     return '<tr><td><div class="name">'+esc(c.name)+'</div><div class="mono">'+esc(c.id)+'</div></td><td>'+badge(c.type==='public'?'Público':'Privado',c.type==='public'?'':'purple')+'</td><td><div class="name">'+esc(c.ownerName)+'</div><div class="mono">'+esc(c.ownerUid)+'</div></td><td>'+c.memberCount+' total · '+c.onlineCount+' online</td><td>'+tx+'</td><td><div class="actions"><button class="btn btn-ghost btn-sm" data-action="open-channel" data-id="'+esc(c.id)+'">Administrar</button><button class="btn btn-green btn-sm" data-action="listen" data-id="'+esc(c.id)+'">Ouvir</button><button class="btn btn-ghost btn-sm" data-action="rename-channel" data-id="'+esc(c.id)+'">Renomear</button></div></td></tr>';
   }).join('');
 }
+function userLastKnownActivity(u){return Number(u.lastActivityAt||0)||Number(u.accountCreatedAt||0)||0;}
+function userSituation(u){
+  if(u.pendingRegistration)return 'pending';
+  if(u.banned || u.disabled)return 'blocked';
+  if(u.accessExpired)return 'payment';
+  var last=userLastKnownActivity(u);
+  if(!u.online && last>0 && Date.now()-last>=state.inactiveDays*86400000)return 'inactive';
+  return 'active';
+}
+function updateUserStatusTabs(users){
+  var counts={all:users.length,active:0,blocked:0,payment:0,inactive:0,pending:0};
+  users.forEach(function(u){counts[userSituation(u)]++;});
+  els.userStatusTabs.querySelectorAll('[data-user-status]').forEach(function(b){
+    var key=b.getAttribute('data-user-status');b.classList.toggle('active',state.userStatus===key);
+    var n=b.querySelector('[data-status-count]');if(n)n.textContent=counts[key]||0;
+  });
+}
+
 function renderUsers(){
-  var rows=(state.overview.users||[])
+  var all=state.overview.users||[];
+  updateUserStatusTabs(all);
+  var rows=all
+    .filter(function(u){return state.userStatus==='all'||userSituation(u)===state.userStatus;})
     .filter(function(u){return matchSearch([u.name,u.uid,u.email,u.activeChannelId,u.accountStatus]);})
     .sort(function(a,b){
       if(!!a.pendingRegistration!==!!b.pendingRegistration)return a.pendingRegistration?-1:1;
@@ -1072,6 +1129,7 @@ function renderUsers(){
   els.usersBody.innerHTML=rows.map(function(u){
     var pending=!!u.pendingRegistration;
     var conn=pending?badge('Cadastro pendente','orange'):(u.online?badge('Online','green'):badge('Offline',''));
+    if(!u.online&&!pending){conn+='<div class="sub">Última atividade: '+(userLastKnownActivity(u)?esc(fmtDate(userLastKnownActivity(u))):'não informada')+'</div>';}
     var acc='';
     if(pending){
       acc=badge(u.accountStatus==='pending_payment'?'Aguardando pagamento':(u.emailVerified?'E-mail confirmado':'Aguardando e-mail'),'orange');
@@ -1379,6 +1437,55 @@ async function actionRegistrationPolicy(){
     paidRegistrationEnabled:$('paidRegistrationEnabled').checked,
     plans:nextPlans
   },'Política de cadastro atualizada.');
+}
+
+function displayVerificationBulkStatus(info){
+  var running=info&&info.state==='running';
+  state.bulkRunning=!!running;
+  els.sendBulkVerificationBtn.disabled=running || !((state.overview&&state.overview.emailVerification)||{}).resendConfigured;
+  els.stopBulkVerificationBtn.classList.toggle('hidden',!running);
+  var message='';
+  if(!info||info.state==='idle') message='Pronto para enviar confirmações em lote. Contas legadas só entram com autorização explícita.';
+  else{
+    message='Situação: '+({running:'Enviando',completed:'Concluído',cancelled:'Interrompido',stopped:'Interrompido por erro'})[info.state]+' · '+Number(info.processed||0)+' de '+Number(info.total||0)+' examinados · '+Number(info.sent||0)+' enviados · '+Number(info.skipped||0)+' ignorados · '+Number(info.failed||0)+' falhas';
+    if(info.error)message+=' · '+info.error;
+  }
+  els.bulkVerificationStatus.textContent=message;
+  els.bulkVerificationStatus.classList.toggle('warning',!!(info&&info.error));
+  if(state.bulkPollTimer){clearTimeout(state.bulkPollTimer);state.bulkPollTimer=null;}
+  if(running){state.bulkPollTimer=setTimeout(refreshVerificationBulkStatus,4500);}
+}
+async function refreshVerificationBulkStatus(){
+  if(!state.token)return;
+  try{displayVerificationBulkStatus(await api('/api/master/users/resend-verification-bulk/status'));}
+  catch(e){els.bulkVerificationStatus.textContent='Não foi possível consultar os envios: '+e.message;state.bulkPollTimer=null;}
+}
+async function actionBulkVerification(){
+  if(state.bulkRunning)return;
+  var config=(state.overview&&state.overview.emailVerification)||{};
+  if(!config.resendConfigured){toast('Configure o reenvio Firebase primeiro.','error');return;}
+  var all=(state.overview&&state.overview.users)||[];
+  var requiredCount=all.filter(function(u){return u.email&&!u.emailVerified&&!u.banned&&(u.emailVerificationRequired||u.pendingRegistration);}).length;
+  var legacyCount=all.filter(function(u){return u.email&&!u.emailVerified&&!u.banned&&!u.emailVerificationRequired&&!u.pendingRegistration;}).length;
+  var ok=await modal({
+    title:'Reenviar confirmação para vários usuários',
+    text:'A operação é gradual e pode demorar. E-mails já reenviados nas últimas 24 horas serão ignorados. O Firebase poderá aplicar limites de envio.',
+    html:'<div class="hint">Contas com confirmação exigida: '+requiredCount+'. Contas antigas sem exigência: '+legacyCount+'.</div>'+ 
+      '<label class="checkbox"><input type="checkbox" id="includeLegacyInBulk"><span>Incluir também as contas legadas sem verificação obrigatória (elas continuarão dispensadas da exigência).</span></label>',
+    okText:'Iniciar reenvio em lote'
+  });
+  if(!ok)return;
+  var includeLegacy=!!$('includeLegacyInBulk')?.checked;
+  els.sendBulkVerificationBtn.disabled=true;
+  try{
+    var result=await api('/api/master/users/resend-verification-bulk','POST',{includeLegacy:includeLegacy});
+    displayVerificationBulkStatus(result);toast('Reenvio em lote iniciado.','ok');
+  }catch(e){toast(e.message,'error');els.sendBulkVerificationBtn.disabled=false;await refreshVerificationBulkStatus();}
+}
+async function actionStopBulkVerification(){
+  if(!state.bulkRunning)return;
+  try{await api('/api/master/users/resend-verification-bulk/cancel','POST',{});toast('Interrupção solicitada.','ok');await refreshVerificationBulkStatus();}
+  catch(e){toast(e.message,'error');}
 }
 
 async function actionResendVerification(uid){
@@ -1842,6 +1949,10 @@ var audio={
   }
 };
 
+els.userStatusTabs.addEventListener('click',function(e){var b=e.target.closest('[data-user-status]');if(!b)return;state.userStatus=b.getAttribute('data-user-status');renderUsers();});
+els.userInactiveDays.addEventListener('change',function(){state.inactiveDays=Number(this.value)||30;renderUsers();});
+els.sendBulkVerificationBtn.addEventListener('click',actionBulkVerification);
+els.stopBulkVerificationBtn.addEventListener('click',actionStopBulkVerification);
 els.loginBtn.addEventListener('click',login);els.tokenInput.addEventListener('keydown',function(e){if(e.key==='Enter')login();});els.createUserBtn.addEventListener('click',actionCreateUser);els.accountLimitBtn.addEventListener('click',actionAccountLimit);els.channelCreationLimitBtn.addEventListener('click',actionChannelCreationDefaultLimit);els.registrationPolicyBtn.addEventListener('click',actionRegistrationPolicy);els.refreshBtn.addEventListener('click',function(){refresh(false);});els.logoutBtn.addEventListener('click',logout);els.searchInput.addEventListener('input',function(){state.search=this.value.trim();renderChannels();renderUsers();renderUnverifiedUsers();});
 document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});t.classList.add('active');state.tab=t.getAttribute('data-tab');els.channelsPanel.classList.toggle('hidden',state.tab!=='channels');els.usersPanel.classList.toggle('hidden',state.tab!=='users');els.unverifiedPanel.classList.toggle('hidden',state.tab!=='unverified');});});
 els.channelsBody.addEventListener('click',clickAction);els.usersBody.addEventListener('click',clickAction);els.unverifiedBody.addEventListener('click',clickAction);els.drawerBody.addEventListener('click',clickAction);els.drawerClose.addEventListener('click',closeDrawer);els.drawerBackdrop.addEventListener('click',function(e){if(e.target===els.drawerBackdrop)closeDrawer();});els.modalCancel.addEventListener('click',function(){modalDone(false);});els.modalOk.addEventListener('click',function(){modalDone(true);});els.modalBackdrop.addEventListener('click',function(e){if(e.target===els.modalBackdrop)modalDone(false);});els.audioStop.addEventListener('click',function(){audio.stop();});els.volumeRange.addEventListener('input',function(){audio.setVolume(this.value);});
